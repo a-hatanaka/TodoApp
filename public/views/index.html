@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="../stylesheets/style.css" />
+
+    <title>Todoアプリ</title>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Content here -->
+      <div id="main-contents">
+        <button
+          type="button"
+          id="create-btn"
+          class="btn btn-success"
+          data-toggle="modal"
+          data-target="#exampleModal"
+        >
+          ＋ タスクを追加
+        </button>
+        <ul id="todo-list">
+          <li class="justify-content-md-center">
+            <span class="color-orange"></span>
+            <div class="list-content col col-10">
+              <span class="todo-text">犬の散歩</span>
+              <span class="created-date">2022月5月4日</span>
+            </div>
+            <button
+              type="button"
+              class="btn btn-primary todo-update col col-1"
+              data-toggle="modal"
+              data-target="#exampleModal2"
+            >
+              更新
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger todo-delete col col-1"
+              data-toggle="modal"
+              data-target="#exampleModalCenter"
+            >
+              削除
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- CreateTodo Modal -->
+    <div
+      class="modal fade"
+      id="exampleModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">タスク 登録</h5>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group">
+                <label for="exampleFormControlInput1">タスク</label>
+                <input
+                  type="text"
+                  class="form-control back-gray"
+                  id="exampleFormControlInput1"
+                  placeholder=""
+                />
+              </div>
+              <div class="form-group">
+                <label for="exampleFormControlInput1">期限</label>
+                <input
+                  type="text"
+                  class="form-control back-gray"
+                  id="exampleFormControlInput2"
+                  placeholder=""
+                />
+              </div>
+              <div class="form-group">
+                <label for="exampleFormControlSelect1">カテゴリ</label>
+                <select
+                  class="form-control back-gray"
+                  id="exampleFormControlSelect1"
+                >
+                  <option>その他</option>
+                  <option>勉強</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>5</option>
+                </select>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary back-gray"
+              data-dismiss="modal"
+            >
+              キャンセル
+            </button>
+            <button type="button" class="btn btn-primary">登録</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DeleteTodo Modal  -->
+    <div
+      class="modal fade"
+      id="exampleModalCenter"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalCenterTitle"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalCenterTitle">
+              タスクを削除
+            </h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">犬の散歩</div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              キャンセル
+            </button>
+            <button type="button" class="btn btn-primary">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- UpdateTodo Modal -->
+    <div
+      class="modal fade"
+      id="exampleModal2"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel2">タスクの更新</h5>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group">
+                <label for="exampleForm2ControlInput1">タスク</label>
+                <input
+                  type="text"
+                  class="form-control back-gray"
+                  id="exampleForm2ControlInput1"
+                  placeholder=""
+                />
+              </div>
+              <div class="form-group">
+                <label for="exampleForm2ControlInput2">期限</label>
+                <input
+                  type="text"
+                  class="form-control back-gray"
+                  id="exampleForm2ControlInput2"
+                  placeholder=""
+                />
+              </div>
+              <div class="form-group">
+                <label for="exampleForm2ControlSelect1">カテゴリ</label>
+                <select
+                  class="form-control back-gray"
+                  id="exampleForm2ControlSelect1"
+                >
+                  <option>その他</option>
+                  <option>勉強</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>5</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="exampleFormControlSelect2">ステータス</label>
+                <select
+                  class="form-control back-gray"
+                  id="exampleForm2ControlSelect2"
+                >
+                  <option>進行中</option>
+                  <option>未実施</option>
+                  <option>実施済み</option>
+                </select>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary back-gray"
+              data-dismiss="modal"
+            >
+              キャンセル
+            </button>
+            <button type="button" class="btn btn-primary">登録</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+      integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+      crossorigin="anonymous"
+    ></script>
+    <script src="../javascripts/index.js"></script>
+    <script>
+      $(async function () {
+        const data = await httpGet("//" + window.location.host + "/api/items");
+        const list = data.map((item) => {
+          return `<li class="justify-content-md-center">
+                    <span class="color-orange"></span>
+                    <div class="list-content col col-10">
+                      <span class="todo-text">犬の散歩</span>
+                      <span class="created-date">2022月5月4日</span>
+                    </div>
+                    <button
+                      type="button"
+                      class="btn btn-primary todo-update col col-1"
+                      data-toggle="modal"
+                      data-target="#exampleModal2"
+                    >
+                      更新
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-danger todo-delete col col-1"
+                      data-toggle="modal"
+                      data-target="#exampleModalCenter"
+                    >
+                      削除
+                    </button>
+                  </li>`;
+          $("#todo-list").append(list);
+        });
+      });
+    </script>
+  </body>
+</html>

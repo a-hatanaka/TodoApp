@@ -1,0 +1,52 @@
+body {
+  padding: 50px 100px 50px 100px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  background-color: gainsboro;
+}
+
+a {
+  color: #00b7ff;
+}
+
+li {
+  list-style: none;
+}
+.color-orange {
+  background-color: orange;
+  min-width: 15px;
+}
+
+.hide {
+  display: none;
+}
+
+#todo-list li {
+  margin: 20px 0 20px 0;
+  display: flex;
+  text-align: center;
+}
+
+.list-content {
+  display: flex;
+  justify-content: space-between;
+  background-color: white;
+  padding: 10px 20px 10px 10px;
+  font-size: 1rem;
+}
+
+.todo-update,
+.todo-delete {
+  border-radius: 0;
+  text-emphasis: right;
+  font-size: 1rem;
+  padding: 1px;
+}
+
+.modal-title {
+  font-weight: bold;
+}
+
+.back-gray {
+  background-color: gainsboro;
+  color: black;
+}
