@@ -75,10 +75,11 @@
             <h5 class="modal-title" id="exampleModalLabel">タスク 登録</h5>
           </div>
           <div class="modal-body">
-            <form>
+            <form action="#" method="post">
               <div class="form-group">
                 <label for="exampleFormControlInput1">タスク</label>
                 <input
+                  name="task_name"
                   type="text"
                   class="form-control back-gray"
                   id="exampleFormControlInput1"
@@ -88,24 +89,25 @@
               <div class="form-group">
                 <label for="exampleFormControlInput1">期限</label>
                 <input
+                  name="deadline"
                   type="text"
                   class="form-control back-gray"
                   id="exampleFormControlInput2"
-                  placeholder=""
+                  placeholder="2022/06/31もしくは2022-06-31の形式でお願いします"
                 />
               </div>
               <div class="form-group">
                 <label for="exampleFormControlSelect1">カテゴリ</label>
                 <select
+                  name="category_id"
                   class="form-control back-gray"
                   id="exampleFormControlSelect1"
                 >
-                  <option>その他</option>
-                  <option>勉強</option>
-                  <option>2</option>
-                  <option>3</option>
-                  <option>4</option>
-                  <option>5</option>
+                  <option value="0">カテゴリ</option>
+                  <option value="1">生活</option>
+                  <option value="2">勉強</option>
+                  <option value="3">仕事</option>
+                  <option value="4">趣味</option>
                 </select>
               </div>
             </form>
@@ -118,7 +120,7 @@
             >
               キャンセル
             </button>
-            <button type="button" class="btn btn-primary">登録</button>
+            <button id="create-task" type="button" class="btn btn-primary">登録</button>
           </div>
         </div>
       </div>
@@ -259,12 +261,17 @@
     <script>
       $(async function () {
         const data = await httpGet("//" + window.location.host + "/api/items");
+        console.log(data);
         const list = data.map((item) => {
+          var deadline = new Date(item.deadline);
+          var year = deadline.getFullYear();
+          var month = deadline.getMonth() +1;
+          var day = deadline.getDate();
           return `<li class="justify-content-md-center">
                     <span class="color-orange"></span>
                     <div class="list-content col col-10">
-                      <span class="todo-text">犬の散歩</span>
-                      <span class="created-date">2022月5月4日</span>
+                      <span class="todo-text">${item.task_name}</span>
+                      <span class="created-date">${year+'年'+month+'月'+day+'日'}</span>
                     </div>
                     <button
                       type="button"
@@ -283,9 +290,53 @@
                       削除
                     </button>
                   </li>`;
-          $("#todo-list").append(list);
         });
+        $("#todo-list").append(list);
       });
+      $("#create-task").click( async function(){
+        if($("[name=task_name]").val()===''){
+          alert("タスク名は入力必須です");
+          return false;
+        }
+        // const task_name = null ? $("[name=task_name]").val(): alert("タスク名は入力必須です");
+        const task_name = $("[name=task_name]").val();
+        let deadline = $("[name=deadline]").val();
+        const cate_id = $("[name=category_id]").val();
+        deadline = new Date(deadline);
+        let today = new Date();
+        if(deadline < today){
+          alert("今日以降の日付を入れて");
+          errorsCount++;
+          deadline =null;
+          return false;
+        }
+        const data = {
+          task_name: task_name,
+          deadline: deadline,
+          category_id: cate_id
+        };
+        console.log(1);
+        // const response = await httpPost(
+        //   "//" + window.location.host + "/api/tasks",
+        //   data
+        // );
+
+        return false;
+      });
+
+
+      // $("[name=deadline]").on("input",function(){
+      //   if()
+      //   if($(this).val().length === 4){
+      //     $(this).val($(this).val()+ '-');
+      //   }
+      //   if($(this).val().length === 7){
+      //     $(this).val($(this).val()+ '-');
+      //   }
+      //   if($(this).val().length === 11){
+      //     alert("これ以上入力は大丈夫です");
+      //   }
+      // });
     </script>
   </body>
 </html>
