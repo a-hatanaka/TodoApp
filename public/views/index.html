@@ -182,12 +182,19 @@
           <div class="modal-body">
             <form>
               <div class="form-group">
-                <label for="exampleForm2ControlInput1">タスク</label>
+                <input
+                  type="hidden"
+                  class="form-control back-gray"
+                  id="update_id"
+                  name="update_id"
+                />
+                <label for="update_name">タスク</label>
                 <input
                   type="text"
                   class="form-control back-gray"
-                  id="exampleForm2ControlInput1"
+                  id="update_name"
                   placeholder=""
+                  name="update_name"
                 />
               </div>
               <div class="form-group">
@@ -195,33 +202,35 @@
                 <input
                   type="text"
                   class="form-control back-gray"
-                  id="exampleForm2ControlInput2"
+                  id="update_deadline"
                   placeholder=""
+                  name="update_deadline"
                 />
               </div>
               <div class="form-group">
                 <label for="exampleForm2ControlSelect1">カテゴリ</label>
                 <select
                   class="form-control back-gray"
-                  id="exampleForm2ControlSelect1"
+                  id="update_cate"
+                  name="update_cate"
                 >
-                  <option>その他</option>
-                  <option>勉強</option>
-                  <option>2</option>
-                  <option>3</option>
-                  <option>4</option>
-                  <option>5</option>
+                  <option value="0">該当カテゴリなし</option>
+                  <option value="1">生活</option>
+                  <option value="2">勉強</option>
+                  <option value="3">仕事</option>
+                  <option value="4">趣味</option>
                 </select>
               </div>
               <div class="form-group">
                 <label for="exampleFormControlSelect2">ステータス</label>
                 <select
                   class="form-control back-gray"
-                  id="exampleForm2ControlSelect2"
+                  id="udpate_status"
+                  name="update_status"
                 >
-                  <option>進行中</option>
-                  <option>未実施</option>
-                  <option>実施済み</option>
+                  <option value="1">完了</option>
+                  <option value="2">作業中</option>
+                  <option value="3">未実施</option>
                 </select>
               </div>
             </form>
@@ -234,7 +243,7 @@
             >
               キャンセル
             </button>
-            <button type="button" class="btn btn-primary">登録</button>
+            <button id="update-complete" type="button" class="btn btn-primary">更新</button>
           </div>
         </div>
       </div>
@@ -285,6 +294,11 @@
                       class="btn btn-primary todo-update col col-1"
                       data-toggle="modal"
                       data-target="#exampleModal2"
+                      data-task_id="${item.id}"
+                      data-task_name="${item.task_name}"
+                      data-deadline="${dateString}"
+                      data-task_status="${item.task_status}"
+                      data-cate_id="${item.category_id}"
                     >
                       更新
                     </button>
@@ -303,13 +317,12 @@
         $("#todo-list").append(list);
       });
 
-
+      // Create New Task
       $("#create-task").click( async function(){
         if($("[name=task_name]").val()===''){
           alert("タスク名は入力必須です");
           return false;
         }
-  
         const task_name = $("[name=task_name]").val();
         let deadline = $("[name=deadline]").val();
         const cate_id = $("[name=category_id]").val();
@@ -339,9 +352,8 @@
         window.location.reload();
       });
 
-
+      // Useless function
       // $("[name=deadline]").on("input",function(){
-      //   if()
       //   if($(this).val().length === 4){
       //     $(this).val($(this).val()+ '-');
       //   }
@@ -353,6 +365,54 @@
       //   }
       // });
 
+
+      // Update
+      $(document).on("click", ".todo-update", function(){
+        $("[name=update_id]").val($(this).data('task_id'));
+        $("[name=update_name]").val($(this).data('task_name'));
+        $("[name=update_deadline]").val($(this).data('deadline'));
+        $("[name=update_cate]").val($(this).data('cate_id'));
+        $("[name=update_status]").val($(this).data('task_status'));
+        $("[name=update_id]").val($(this).data('task_id'));
+        $("#update-complete").click( async function(){
+          let id = $("[name=update_id]").val();
+          let name = $("[name=update_name]").val();
+          if(name===""){
+            alert("タスク名は空にできません。");
+            $("#exampleModal2").modal("hide");
+            return false;
+          }
+          let deadline = $("[name=update_deadline]").val();
+          if(deadline==="" || deadline==="期限設定なし"){
+            deadline = null;
+          } else {
+            let toDate = new Date(deadline);
+            let now = new Date();
+            if(toDate < now){
+              alert("今日以降の日付を指定してください。");
+              $("#exampleModal2").modal("hide");
+              return false;
+            }
+          }
+          let cate_id = $("[name=update_cate]").val();
+          let status = $("[name=update_status]").val();
+          const data = {
+            task_name: name,
+            category_id: cate_id,
+            deadline: deadline,
+            task_status: status,
+          };
+          const response = await httpUpdate(
+            "//" + window.location.host + "/api/tasks/" + id,
+            data
+          )
+          alert("更新完了しました。");
+          console.log(response);
+          window.location.reload();
+        });
+      });
+
+      // Delete Task
       $(document).on("click", ".todo-delete",function(){
         let id = $(this).data('id');
         let taskName = $(this).data('task_name');
@@ -362,10 +422,11 @@
             "//" + window.location.host + "/api/tasks/" + id
           );
           console.log(response);
+          alert("Delete Complete!");
           window.location.reload();
         });
-        
       });
+
 
     </script>
   </body>

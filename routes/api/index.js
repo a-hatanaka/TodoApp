@@ -2,6 +2,7 @@ var express = require("express");
 const items = require("../../src/items");
 const create = require("../../src/tasks/create.js");
 const del = require("../../src/tasks/delete.js");
+const update = require("../../src/tasks/update.js");
 
 var router = express.Router();
 
@@ -31,6 +32,12 @@ router.delete("/tasks/:id", function(req, res, next){
   const deleteTask = del.deleteTask(req.params.id);
   res.send(deleteTask);
   console.log(1);
+});
+
+router.patch("/tasks/:id", function(req, res, next){
+  console.log(req.params.id);
+  const updateTask = update.updateTask(req.params.id, req.body);
+  res.send(updateTask);
 });
 
 module.exports = router;
