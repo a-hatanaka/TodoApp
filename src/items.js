@@ -18,6 +18,8 @@ getListItem = async function () {
     return rows;
   } catch (error) {
     console.log(error);
+  } finally {
+    connection.end();
   }
 };
 

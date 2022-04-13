@@ -36,7 +36,7 @@
           <li class="justify-content-md-center">
             <span class="color-orange"></span>
             <div class="list-content col col-10">
-              <span class="todo-text">犬の散歩</span>
+              <span class="todo-text">Example</span>
               <span class="created-date">2022月5月4日</span>
             </div>
             <button
@@ -75,7 +75,7 @@
             <h5 class="modal-title" id="exampleModalLabel">タスク 登録</h5>
           </div>
           <div class="modal-body">
-            <form action="#" method="post">
+            <form method="post">
               <div class="form-group">
                 <label for="exampleFormControlInput1">タスク</label>
                 <input
@@ -139,7 +139,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalCenterTitle">
-              タスクを削除
+              このタスクを削除しますか？
             </h5>
             <button
               type="button"
@@ -150,7 +150,7 @@
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div class="modal-body">犬の散歩</div>
+          <p class="modal-body" id="will_delete"></p>
           <div class="modal-footer">
             <button
               type="button"
@@ -159,7 +159,7 @@
             >
               キャンセル
             </button>
-            <button type="button" class="btn btn-primary">OK</button>
+            <button id="delete-complete" type="button" class="btn btn-primary">削除</button>
           </div>
         </div>
       </div>
@@ -263,15 +263,22 @@
         const data = await httpGet("//" + window.location.host + "/api/items");
         console.log(data);
         const list = data.map((item) => {
-          var deadline = new Date(item.deadline);
-          var year = deadline.getFullYear();
-          var month = deadline.getMonth() +1;
-          var day = deadline.getDate();
+          let dateString='';
+          if(item.deadline!==null){
+            var deadline = new Date(item.deadline);
+            console.log(deadline);
+            var year = deadline.getFullYear();
+            var month = deadline.getMonth() +1;
+            var day = deadline.getDate();
+            dateString = year+'年'+month+'月'+day+'日';
+          }else {
+            dateString = '期限設定なし';
+          }
           return `<li class="justify-content-md-center">
                     <span class="color-orange"></span>
                     <div class="list-content col col-10">
                       <span class="todo-text">${item.task_name}</span>
-                      <span class="created-date">${year+'年'+month+'月'+day+'日'}</span>
+                      <span class="created-date">${dateString}</span>
                     </div>
                     <button
                       type="button"
@@ -286,6 +293,8 @@
                       class="btn btn-danger todo-delete col col-1"
                       data-toggle="modal"
                       data-target="#exampleModalCenter"
+                      data-id="${item.id}"
+                      data-task_name="${item.task_name}"
                     >
                       削除
                     </button>
@@ -293,35 +302,41 @@
         });
         $("#todo-list").append(list);
       });
+
+
       $("#create-task").click( async function(){
         if($("[name=task_name]").val()===''){
           alert("タスク名は入力必須です");
           return false;
         }
-        // const task_name = null ? $("[name=task_name]").val(): alert("タスク名は入力必須です");
+  
         const task_name = $("[name=task_name]").val();
         let deadline = $("[name=deadline]").val();
         const cate_id = $("[name=category_id]").val();
-        deadline = new Date(deadline);
+        if(deadline!==null){
+          deadline = new Date(deadline);
+        }
         let today = new Date();
         if(deadline < today){
           alert("今日以降の日付を入れて");
-          errorsCount++;
           deadline =null;
           return false;
+        } else{
+          console.log(today);
         }
         const data = {
           task_name: task_name,
           deadline: deadline,
           category_id: cate_id
         };
-        console.log(1);
-        // const response = await httpPost(
-        //   "//" + window.location.host + "/api/tasks",
-        //   data
-        // );
-
-        return false;
+        $("#exampleModal").modal('hide');
+        const response = await httpPost(
+          "//" + window.location.host + "/api/tasks",
+          data
+        );
+        alert("追加完了しました。");
+        console.log(response);
+        window.location.reload();
       });
 
 
@@ -337,6 +352,21 @@
       //     alert("これ以上入力は大丈夫です");
       //   }
       // });
+
+      $(document).on("click", ".todo-delete",function(){
+        let id = $(this).data('id');
+        let taskName = $(this).data('task_name');
+        $("#will_delete").text(taskName);
+        $("#delete-complete").click( async function(){
+          const response = await httpDelete(
+            "//" + window.location.host + "/api/tasks/" + id
+          );
+          console.log(response);
+          window.location.reload();
+        });
+        
+      });
+
     </script>
   </body>
 </html>
