@@ -4,16 +4,16 @@ body {
   background-color: gainsboro;
 }
 
+svg {
+  overflow: visible;
+}
+
 a {
   color: #00b7ff;
 }
 
 li {
   list-style: none;
-}
-.color-orange {
-  background-color: orange;
-  min-width: 15px;
 }
 
 .hide {
@@ -49,4 +49,46 @@ li {
 .back-gray {
   background-color: gainsboro;
   color: black;
+}
+
+.error-message {
+  margin-left: 10%;
+}
+
+.task-complete {
+  position: relative;
+  left: -25px;
+  font-size: 20px;
+  overflow: visible;
+  margin-top: 10px;
+}
+
+.stripe {
+  text-decoration: line-through;
+}
+
+.minus-margin {
+  margin-left: -20px;
+}
+
+.backGray {
+  background-color: darkgray;
+}
+
+
+.blueTag {
+  background-color: skyblue;
+  min-width: 15px;
+}
+
+.grayTag {
+  background-color: darkgray;
+  min-width: 15px;
+  margin-left: -20px;
+}
+
+
+.redTag {
+  background-color: red;
+  min-width: 15px;
 }
