@@ -26,12 +26,21 @@ router.get("/category/:category_id", async function(req,res,next){
   res.send(filteredItem);
 });
 
+// Sort tasks
+router.get("/sort/:sortby", async function(req,res,next){
+  console.log(1);
+  console.log(req.params);
+  const sortedItem = await items.sortTasks(req.params.sortby);
+  res.send(sortedItem);
+});
+
 // search
 router.get("/search/:keyword", async function(req,res,next){
   const searchedItem = await items.searchItem(req.params.keyword);
   console.log(searchedItem);
   res.send(searchedItem);
 });
+
 
 // 新規タスク登録
 router.post("/tasks", function(req,res,next){
@@ -40,6 +49,7 @@ router.post("/tasks", function(req,res,next){
   res.send(createTask);
 });
 
+
 // タスク削除
 router.delete("/tasks/:id", function(req, res, next){
   console.log(req.body);
@@ -47,6 +57,7 @@ router.delete("/tasks/:id", function(req, res, next){
   res.send(deleteTask);
   console.log(1);
 });
+
 
 router.patch("/tasks/:id", function(req, res, next){
   console.log(req.params.id);

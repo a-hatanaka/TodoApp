@@ -28,18 +28,20 @@ $(async function () {
     let blueTag = '';
     let grayTag = '';
     let redTag = '';
+    let completed_task = '';
     console.log(item.task_status);
     if(item.task_status===1){
       checkIcon = "<i class='task-complete bi bi-check-circle'></i>";
       stripe = 'stripe';
       backGray = 'backGray';
       grayTag = 'grayTag';
+      completed_task = 'completed_task';
     }else if(item.task_status===2){
       blueTag = 'blueTag';
     }else{
       redTag = 'redTag';
     }
-    return `<li class="justify-content-md-center">
+    return `<li class="justify-content-md-center ${completed_task}">
               ${checkIcon}
               <span class="${redTag} ${blueTag} ${grayTag}"></span>
               <div class="list-content col col-10 ${backGray}">
@@ -355,8 +357,89 @@ $("[name=category_filter]").on("change", async function(){
   $("#todo-list").append(filteredList);
 });
 
+// sort tasks
+$("[name=sort-by]").on("change", async function(){
+  const sortBy = $("[name=sort-by]").val();
+  const data = await httpGet(
+    "//" + window.location.host + "/api/sort/" + sortBy
+  );
+  $("#todo-list").empty();
+  const filteredList = data.map((item) => {
+    let dateString='';
+    if(item.deadline!==null){
+      var deadline = new Date(item.deadline);
+      console.log(deadline);
+      var year = deadline.getFullYear();
+      var month = deadline.getMonth() +1;
+      var day = deadline.getDate();
+      dateString = year+'年'+month+'月'+day+'日';
+    }else {
+      dateString = '期限設定なし';
+    }
+    let checkIcon = '';
+    let stripe = '';
+    let backGray = '';
+    let blueTag = '';
+    let grayTag = '';
+    let redTag = '';
+    if(item.task_status===1){
+      checkIcon = "<i class='task-complete bi bi-check-circle'></i>";
+      stripe = 'stripe';
+      backGray = 'backGray';
+      grayTag = 'grayTag';
+    }else if(item.task_status===2){
+      blueTag = 'blueTag';
+    }else{
+      redTag = 'redTag';
+    }
+    return `<li class="justify-content-md-center">
+              ${checkIcon}
+              <span class="${redTag} ${blueTag} ${grayTag}"></span>
+              <div class="list-content col col-10 ${backGray}">
+                <span class="todo-text ${stripe}">${item.task_name}</span>
+                <span class="created-date ${stripe}">${dateString}</span>
+              </div>
+              <button
+                type="button"
+                class="btn btn-primary todo-update col col-1"
+                data-toggle="modal"
+                data-target="#exampleModal2"
+                data-task_id="${item.id}"
+                data-task_name="${item.task_name}"
+                data-deadline="${dateString}"
+                data-task_status="${item.task_status}"
+                data-cate_id="${item.category_id}"
+              >
+                更新
+              </button>
+              <button
+                type="button"
+                class="btn btn-danger todo-delete col col-1"
+                data-toggle="modal"
+                data-target="#exampleModalCenter"
+                data-id="${item.id}"
+                data-task_name="${item.task_name}"
+              >
+                削除
+              </button>
+            </li>`;
+  });
+  $("#todo-list").append(filteredList);
+});
 
+// Hide completed task.
 
+$("#completed-hide").on("click",function(){
+  if(!$(this).hasClass("active")){
+    $(this).addClass("active");
+    $(".completed_task").toggle("hide");
+    $(this).text("モドス");
+  } else{
+    $(this).removeClass("active");
+    $(".completed_task").toggle("hide");
+    $(this).text("完了タスクをカスク");
+  }
+});
 
 function inputError(where,message){
   $(where).text(message).css("color", "red");

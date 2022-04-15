@@ -35,6 +35,16 @@
           ＋ タスクを追加
         </button>
 
+        <div id="sort-tasks">
+          <select name="sort-by">
+            <option value="0">追加順</option>
+            <option value="1">期限昇順</option>
+            <option value="2">期限降順</option>
+            <!-- <option value="3">完了済み後に</option>
+            <option value="4">趣味</option> -->
+          </select>
+        </div>
+
         <div id="category-filter">
           <select name="category_filter">
             <option value="0">カテゴリ</option>
@@ -51,6 +61,7 @@
         </div>
 
         <ul id="todo-list">
+          <button id="completed-hide">完了タスクをカスク</button>
           <!-- APIで取得したdataを処理したものが入る(appendされる) -->
         </ul>
       </div>

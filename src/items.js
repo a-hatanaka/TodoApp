@@ -63,6 +63,35 @@ categoryFilter = async function(category_id){
   }
 }
 
+// sort
+sortTasks = async function(sortBy){
+  let connection = null;
+  try {
+    connection = await mysql.createConnection(config.dbSetting);
+    // SQL記述
+    let sql = '';
+    switch (sortBy) {
+      case '1':
+        sql = 'SELECT * FROM t_task ORDER BY deadline ASC';
+        break;
+      case '2':
+        sql = 'SELECT * FROM t_task ORDER BY deadline DESC';
+        break;
+      default:
+        sql = 'SELECT * FROM t_task ORDER BY id';
+        break;
+    }
+    const [rows, fields] = await connection.query(sql);
+    console.log(rows);
+    return rows;
+  } catch (error) {
+    console.log(error);
+  } finally {
+    connection.end();
+    console.log('end');
+  }
+}
+
 
 // タスク検索
 searchItem = async function(keyword){
@@ -89,3 +118,4 @@ exports.getListItem = getListItem;
 exports.getItem = getItem;
 exports.categoryFilter = categoryFilter;
 exports.searchItem = searchItem;
+exports.sortTasks = sortTasks;

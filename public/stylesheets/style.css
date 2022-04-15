@@ -57,6 +57,11 @@ li {
   min-width: 15px;
 }
 
+#sort-tasks {
+  float: right;
+  margin-left: 50px;
+}
+
 #category-filter {
   margin-left: 50px;
   float: right;
