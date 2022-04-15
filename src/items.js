@@ -29,9 +29,43 @@ getListItem = async function () {
  *
  * @returns レスポンス JSON
  */
-getItem = function (id) {
-  return id + "の商品情報です。";
+getItem = async function (id) {
+  let connection = null;
+  try {
+    connection = await mysql.createConnection(config.dbSetting);
+    // SQL記述
+    const sql = "SELECT * FROM t_task WHERE id=?";
+    let data = [id];
+    const [rows, fields] = await connection.query(sql, data);
+    return rows;
+  } catch (error) {
+    console.log(error);
+  } finally {
+    connection.end();
+  }
 };
+
+
+// タスク検索
+searchItem = async function(keyword){
+  let connection = null;
+  try {
+    connection = await mysql.createConnection(config.dbSetting);
+    // SQL記述
+    const sql = 'SELECT * FROM t_task WHERE task_name LIKE ?';
+    keyword = "%" + keyword + "%";
+    let data = [keyword];
+    const [rows, fields] = await connection.query(sql, data);
+    return rows;
+
+  } catch (error) {
+    console.log(error);
+  } finally {
+    connection.end();
+  }
+
+}
 
 exports.getListItem = getListItem;
 exports.getItem = getItem;
+exports.searchItem = searchItem;

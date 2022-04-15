@@ -9,8 +9,9 @@ console.log(id);
   try {
     connection = await mysql.createConnection(config.dbSetting);
     // SQL記述
-    const sql = "UPDATE t_task SET task_name=?,deadline=?,task_status=?,category_id=? WHERE id=?";
-    let data = [reqBody.task_name, reqBody.deadline, reqBody.task_status, reqBody.category_id, id];
+    const sql = "UPDATE t_task SET task_name=?,deadline=?,task_status=?,category_id=?,updated_at=? WHERE id=?";
+    const now = new Date();
+    let data = [reqBody.task_name, reqBody.deadline, reqBody.task_status, reqBody.category_id, now, id];
     const [rows, fields] = await connection.query(sql, data);
     return rows;
   } catch (error) {

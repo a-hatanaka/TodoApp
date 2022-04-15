@@ -34,31 +34,13 @@
         >
           ＋ タスクを追加
         </button>
+        <div id="search-form" class="form-group">
+          <input name="task-search" type="text" placeholder="タスク検索">
+          <i class="bi bi-search" id="search-icon"></i>
+        </div>
+
         <ul id="todo-list">
-          <li class="justify-content-md-center">
-            <!-- データ一覧作成前のサンプルテキスト -->
-            <!-- <span class="color-orange"></span>
-            <div class="list-content col col-10">
-              <span class="todo-text">Example</span>
-              <span class="created-date">2022月5月4日</span>
-            </div>
-            <button
-              type="button"
-              class="btn btn-primary todo-update col col-1"
-              data-toggle="modal"
-              data-target="#exampleModal2"
-            >
-              更新
-            </button>
-            <button
-              type="button"
-              class="btn btn-danger todo-delete col col-1"
-              data-toggle="modal"
-              data-target="#exampleModalCenter"
-            >
-              削除
-            </button> -->
-          </li>
+           <!-- APIで取得したdataを処理したものが入る(appendされる) -->
         </ul>
       </div>
     </div>
@@ -306,7 +288,7 @@
           }else{
             redTag = 'redTag';
           }
-          return `<li class="justify-content-md-center task-complete">
+          return `<li class="justify-content-md-center">
                     ${checkIcon}
                     <span class="${redTag} ${blueTag} ${grayTag}"></span>
                     <div class="list-content col col-10 ${backGray}">
@@ -494,11 +476,85 @@
         });
       });
 
+      $("#search-icon").click( async function(){
+        let keyword = $("[name=task-search]").val();
+        const data = await httpGet(
+          "//" + window.location.host + "/api/search/" + keyword
+        );
+        $("#todo-list").empty();
+        console.log(data);
+        
+        const searchedList = data.map((item) => {
+          let dateString='';
+          if(item.deadline!==null){
+            var deadline = new Date(item.deadline);
+            console.log(deadline);
+            var year = deadline.getFullYear();
+            var month = deadline.getMonth() +1;
+            var day = deadline.getDate();
+            dateString = year+'年'+month+'月'+day+'日';
+          }else {
+            dateString = '期限設定なし';
+          }
+          let checkIcon = '';
+          let stripe = '';
+          let backGray = '';
+          let blueTag = '';
+          let grayTag = '';
+          let redTag = '';
+          console.log(item.task_status);
+          if(item.task_status===1){
+            checkIcon = "<i class='task-complete bi bi-check-circle'></i>";
+            stripe = 'stripe';
+            backGray = 'backGray';
+            grayTag = 'grayTag';
+          }else if(item.task_status===2){
+            blueTag = 'blueTag';
+          }else{
+            redTag = 'redTag';
+          }
+          return `<li class="justify-content-md-center">
+                    ${checkIcon}
+                    <span class="${redTag} ${blueTag} ${grayTag}"></span>
+                    <div class="list-content col col-10 ${backGray}">
+                      <span class="todo-text ${stripe}">${item.task_name}</span>
+                      <span class="created-date ${stripe}">${dateString}</span>
+                    </div>
+                    <button
+                      type="button"
+                      class="btn btn-primary todo-update col col-1"
+                      data-toggle="modal"
+                      data-target="#exampleModal2"
+                      data-task_id="${item.id}"
+                      data-task_name="${item.task_name}"
+                      data-deadline="${dateString}"
+                      data-task_status="${item.task_status}"
+                      data-cate_id="${item.category_id}"
+                    >
+                      更新
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-danger todo-delete col col-1"
+                      data-toggle="modal"
+                      data-target="#exampleModalCenter"
+                      data-id="${item.id}"
+                      data-task_name="${item.task_name}"
+                    >
+                      削除
+                    </button>
+                  </li>`;
+        });
+        $("#todo-list").append(
+          `検索ワード「${keyword}」を探した結果、\n${data.length}件のタスクがありました。`
+        );
+        $("#todo-list").append(searchedList);
+      });
+
       function inputError(where,message){
         $(where).text(message).css("color", "red");
         console.log("Error output works!");
       }
-
 
     </script>
   </body>

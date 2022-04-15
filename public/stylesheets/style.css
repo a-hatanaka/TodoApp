@@ -20,6 +20,57 @@ li {
   display: none;
 }
 
+
+.back-gray {
+  background-color: gainsboro;
+  color: black;
+}
+
+.stripe {
+  text-decoration: line-through;
+}
+
+
+
+.minus-margin {
+  margin-left: -20px;
+}
+
+.backGray {
+  background-color: darkgray;
+}
+
+
+.blueTag {
+  background-color: skyblue;
+  min-width: 15px;
+}
+
+.grayTag {
+  background-color: darkgray;
+  min-width: 15px;
+  margin-left: -20px;
+}
+
+.redTag {
+  background-color: red;
+  min-width: 15px;
+}
+
+
+#search-form {
+  float: right;
+}
+
+#search-icon {
+  cursor: grab;
+  margin-left: -20px;
+}
+
+#todo-list {
+  margin-top: 100px;
+}
+
 #todo-list li {
   margin: 20px 0 20px 0;
   display: flex;
@@ -46,10 +97,6 @@ li {
   font-weight: bold;
 }
 
-.back-gray {
-  background-color: gainsboro;
-  color: black;
-}
 
 .error-message {
   margin-left: 10%;
@@ -61,34 +108,4 @@ li {
   font-size: 20px;
   overflow: visible;
   margin-top: 10px;
-}
-
-.stripe {
-  text-decoration: line-through;
-}
-
-.minus-margin {
-  margin-left: -20px;
-}
-
-.backGray {
-  background-color: darkgray;
-}
-
-
-.blueTag {
-  background-color: skyblue;
-  min-width: 15px;
-}
-
-.grayTag {
-  background-color: darkgray;
-  min-width: 15px;
-  margin-left: -20px;
-}
-
-
-.redTag {
-  background-color: red;
-  min-width: 15px;
 }

@@ -12,11 +12,18 @@ router.get("/items", async function (req, res, next) {
   res.send(itemsList);
 });
 
-
 /*１件の商品情報を取得するルーティング */
-router.get("/items/:id", function (req, res, next) {
-  const item = items.getItem(req.params.id);
+router.get("/items/:id", async function (req, res, next) {
+  const item = await items.getItem(req.params.id);
+  console.log(item);
   res.send(item);
+});
+
+// search
+router.get("/search/:keyword", async function(req,res,next){
+  const searchedItem = await items.searchItem(req.params.keyword);
+  console.log(searchedItem);
+  res.send(searchedItem);
 });
 
 // 新規タスク登録
