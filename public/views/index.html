@@ -34,6 +34,17 @@
         >
           ＋ タスクを追加
         </button>
+
+        <div id="category-filter">
+          <select name="category_filter">
+            <option value="0">カテゴリ</option>
+            <option value="1">生活</option>
+            <option value="2">勉強</option>
+            <option value="3">仕事</option>
+            <option value="4">趣味</option>
+          </select>
+        </div>
+
         <div id="search-form" class="form-group">
           <input name="task-search" type="text" placeholder="タスク検索">
           <i class="bi bi-search" id="search-icon"></i>
@@ -338,14 +349,7 @@
         // match() は一致する文字が0個の場合、nullを返すが、nullは扱いに困る。よって、空配列[]を入れて、それをカウントさせている。
         if((deadline.match( new RegExp( "-", "g" ))||[]).length===2 || (deadline.match( new RegExp( "/", "g"))||[]).length===2){
           console.log("It includes 2 '-' or '/'");
-        }else{
-          alert("Invalid update");
-          inputError("#create-error","日付が正しいフォーマットで入力されていません。");
-          return false;
-        }
-
-        // 元の値が期限なしで、変更後も期限なしなら、nullをインサートするため。
-        if(deadline==="" || deadline==="期限設定なし"){
+        }else if(deadline==="" || deadline==="期限設定なし"){
           deadline = null;
         } else {
           let targetDate = new Date(deadline);
@@ -360,6 +364,9 @@
             inputError("#create-error","今日以降の日付を指定してください。");
             return false;
           }
+          alert("Invalid update");
+          inputError("#create-error","日付が正しいフォーマットで入力されていません。");
+          return false;
         }
 
         const cate_id = $("[name=category_id]").val();
@@ -414,20 +421,9 @@
           // match() は一致する文字が0個の場合、nullを返すが、nullは扱いに困る。よって、空配列[]を入れて、それをカウントさせている。
           if((deadline.match( new RegExp( "-", "g" ))||[]).length===2 || (deadline.match( new RegExp( "/", "g"))||[]).length===2){
             console.log("It includes 2 '-' or '/'");
-          }else{
-            alert("Invalid update");
-            inputError("#update-error", "日付が正しいフォーマットで入力されていません。");
-            return false;
-          }
-
-          // To hide updateModal, use this code.
-          // $("#exampleModal2").modal("hide");
-
-
-          // 元の値が期限なしで、変更後も期限なしなら、nullをインサートするため。
-          if(deadline==="" || deadline==="期限設定なし"){
+          }else if(deadline==="" || deadline==="期限設定なし"){
             deadline = null;
-          } else {
+          } else{
             let targetDate = new Date(deadline);
             let now = new Date();
             // deadlineに「2022--65」など -/ が2本入っているが、-- や // という形で入っており、不正な場合trueを返す
@@ -441,6 +437,9 @@
               return false;
             }
           }
+
+          // To hide updateModal, use this code.
+          // $("#exampleModal2").modal("hide");
 
           let cate_id = $("[name=update_cate]").val();
           let status = $("[name=update_status]").val();
@@ -476,15 +475,96 @@
         });
       });
 
+      // search task by keyword
       $("#search-icon").click( async function(){
+        $("[name=category_filter]").val(0);
         let keyword = $("[name=task-search]").val();
         const data = await httpGet(
           "//" + window.location.host + "/api/search/" + keyword
         );
         $("#todo-list").empty();
         console.log(data);
-        
+
         const searchedList = data.map((item) => {
+          let dateString='';
+          if(item.deadline!==null){
+            var deadline = new Date(item.deadline);
+            console.log(deadline);
+            var year = deadline.getFullYear();
+            var month = deadline.getMonth() +1;
+            var day = deadline.getDate();
+            dateString = year+'年'+month+'月'+day+'日';
+          }else {
+            dateString = '期限設定なし';
+          }
+          let checkIcon = '';
+          let stripe = '';
+          let backGray = '';
+          let blueTag = '';
+          let grayTag = '';
+          let redTag = '';
+          if(item.task_status===1){
+            checkIcon = "<i class='task-complete bi bi-check-circle'></i>";
+            stripe = 'stripe';
+            backGray = 'backGray';
+            grayTag = 'grayTag';
+          }else if(item.task_status===2){
+            blueTag = 'blueTag';
+          }else{
+            redTag = 'redTag';
+          }
+          return `<li class="justify-content-md-center">
+                    ${checkIcon}
+                    <span class="${redTag} ${blueTag} ${grayTag}"></span>
+                    <div class="list-content col col-10 ${backGray}">
+                      <span class="todo-text ${stripe}">${item.task_name}</span>
+                      <span class="created-date ${stripe}">${dateString}</span>
+                    </div>
+                    <button
+                      type="button"
+                      class="btn btn-primary todo-update col col-1"
+                      data-toggle="modal"
+                      data-target="#exampleModal2"
+                      data-task_id="${item.id}"
+                      data-task_name="${item.task_name}"
+                      data-deadline="${dateString}"
+                      data-task_status="${item.task_status}"
+                      data-cate_id="${item.category_id}"
+                    >
+                      更新
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-danger todo-delete col col-1"
+                      data-toggle="modal"
+                      data-target="#exampleModalCenter"
+                      data-id="${item.id}"
+                      data-task_name="${item.task_name}"
+                    >
+                      削除
+                    </button>
+                  </li>`;
+        });
+        $("#todo-list").append(
+          `検索ワード「${keyword}」を探した結果、\n${data.length}件のタスクがありました。`
+        );
+        $("#todo-list").append(searchedList);
+      });
+
+
+      // filtering by category
+      $("[name=category_filter]").on("change", async function(){
+        $("[name=task-search]").val('');
+        const categoryId = $("[name=category_filter]").val();
+        const data = await httpGet(
+          "//" + window.location.host + "/api/category/" + categoryId
+        );
+        if(data.length===0){
+          alert("カテゴリーに一致するタスクはありません。");
+        }
+        $("#todo-list").empty();
+        console.log(data);
+        const filteredList = data.map((item) => {
           let dateString='';
           if(item.deadline!==null){
             var deadline = new Date(item.deadline);
@@ -545,11 +625,9 @@
                     </button>
                   </li>`;
         });
-        $("#todo-list").append(
-          `検索ワード「${keyword}」を探した結果、\n${data.length}件のタスクがありました。`
-        );
-        $("#todo-list").append(searchedList);
+        $("#todo-list").append(filteredList);
       });
+
 
       function inputError(where,message){
         $(where).text(message).css("color", "red");

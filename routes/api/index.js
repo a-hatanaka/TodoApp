@@ -19,6 +19,13 @@ router.get("/items/:id", async function (req, res, next) {
   res.send(item);
 });
 
+// filtering by category_id
+router.get("/category/:category_id", async function(req,res,next){
+  const filteredItem = await items.categoryFilter(req.params.category_id);
+  console.log(filteredItem);
+  res.send(filteredItem);
+});
+
 // search
 router.get("/search/:keyword", async function(req,res,next){
   const searchedItem = await items.searchItem(req.params.keyword);

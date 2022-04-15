@@ -57,6 +57,10 @@ li {
   min-width: 15px;
 }
 
+#category-filter {
+  margin-left: 50px;
+  float: right;
+}
 
 #search-form {
   float: right;

@@ -45,6 +45,24 @@ getItem = async function (id) {
   }
 };
 
+// カテゴリーによるフィルタリング
+categoryFilter = async function(category_id){
+  let connection = null;
+  try {
+    connection = await mysql.createConnection(config.dbSetting);
+    // SQL記述
+    const sql = 'SELECT * FROM t_task WHERE category_id = ?';
+    let data = [category_id];
+    const [rows, fields] = await connection.query(sql, data);
+    return rows;
+
+  } catch (error) {
+    console.log(error);
+  } finally {
+    connection.end();
+  }
+}
+
 
 // タスク検索
 searchItem = async function(keyword){
@@ -63,9 +81,11 @@ searchItem = async function(keyword){
   } finally {
     connection.end();
   }
-
 }
+
+
 
 exports.getListItem = getListItem;
 exports.getItem = getItem;
+exports.categoryFilter = categoryFilter;
 exports.searchItem = searchItem;
