@@ -12,8 +12,6 @@ const httpGet = async function (url) {
 
 // 登録用API実行メソッド
 const httpPost = async function (url, data) {
-  console.log(url);
-  console.log(data);
   try {
     const response = await fetch(url, {
       method: "POST", // POST

@@ -108,6 +108,11 @@ li {
   padding: 1px;
 }
 
+.deadline-alert {
+  color: red;
+  background-color: red;
+}
+
 .modal-title {
   font-weight: bold;
 }

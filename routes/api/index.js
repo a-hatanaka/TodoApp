@@ -15,21 +15,17 @@ router.get("/items", async function (req, res, next) {
 /*１件の商品情報を取得するルーティング */
 router.get("/items/:id", async function (req, res, next) {
   const item = await items.getItem(req.params.id);
-  console.log(item);
   res.send(item);
 });
 
 // filtering by category_id
 router.get("/category/:category_id", async function(req,res,next){
   const filteredItem = await items.categoryFilter(req.params.category_id);
-  console.log(filteredItem);
   res.send(filteredItem);
 });
 
 // Sort tasks
 router.get("/sort/:sortby", async function(req,res,next){
-  console.log(1);
-  console.log(req.params);
   const sortedItem = await items.sortTasks(req.params.sortby);
   res.send(sortedItem);
 });
@@ -37,14 +33,12 @@ router.get("/sort/:sortby", async function(req,res,next){
 // search
 router.get("/search/:keyword", async function(req,res,next){
   const searchedItem = await items.searchItem(req.params.keyword);
-  console.log(searchedItem);
   res.send(searchedItem);
 });
 
 
 // 新規タスク登録
 router.post("/tasks", function(req,res,next){
-  console.log(req.body);
   const createTask = create.createNewTask(req.body);
   res.send(createTask);
 });
@@ -52,15 +46,12 @@ router.post("/tasks", function(req,res,next){
 
 // タスク削除
 router.delete("/tasks/:id", function(req, res, next){
-  console.log(req.body);
   const deleteTask = del.deleteTask(req.params.id);
   res.send(deleteTask);
-  console.log(1);
 });
 
 
 router.patch("/tasks/:id", function(req, res, next){
-  console.log(req.params.id);
   const updateTask = update.updateTask(req.params.id, req.body);
   res.send(updateTask);
 });

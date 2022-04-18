@@ -21,7 +21,6 @@ createNewTask = async function(reqBody){
     } finally {
         connection.end();
     }
-    console.log(1);
 };
 
 exports.createNewTask = createNewTask;

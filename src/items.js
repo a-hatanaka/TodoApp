@@ -98,7 +98,6 @@ sortTasks = async function(sortBy){
     console.log(error);
   } finally {
     connection.end();
-    console.log('end');
   }
 }
 
@@ -119,7 +118,6 @@ searchItem = async function(keyword){
     let data = [keyword];
     const [rows, fields] = await connection.query(sql, data);
     return rows;
-
   } catch (error) {
     console.log(error);
   } finally {
