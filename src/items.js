@@ -12,7 +12,7 @@ getListItem = async function () {
   try {
     connection = await mysql.createConnection(config.dbSetting);
     // SQL記述
-    const sql = "SELECT * FROM t_task";
+    const sql = "SELECT * FROM t_task LEFT JOIN m_category ON t_task.category_id = m_category.category_id";
     let data = [];
     const [rows, fields] = await connection.query(sql, data);
     return rows;
@@ -45,7 +45,12 @@ getItem = async function (id) {
   }
 };
 
-// カテゴリーによるフィルタリング
+/**
+ * category_filter
+ * カテゴリーに合致した商品一覧を返却する処理
+ *
+ * @returns レスポンス JSON
+ */
 categoryFilter = async function(category_id){
   let connection = null;
   try {
@@ -63,7 +68,12 @@ categoryFilter = async function(category_id){
   }
 }
 
-// sort
+/**
+ * sortTasks
+ * 商品一覧を指定した並び順で返却する処理
+ *
+ * @returns レスポンス JSON
+ */
 sortTasks = async function(sortBy){
   let connection = null;
   try {
@@ -93,7 +103,12 @@ sortTasks = async function(sortBy){
 }
 
 
-// タスク検索
+/**
+ * searchItem
+ * タスクをキーワードで検索して返却する処理
+ *
+ * @returns レスポンス JSON
+ */
 searchItem = async function(keyword){
   let connection = null;
   try {

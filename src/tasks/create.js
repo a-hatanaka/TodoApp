@@ -1,7 +1,12 @@
 const mysql = require("mysql2/promise");
 const config = require("../../config.js");
 
-// 新規登録処理
+/**
+ * createTask
+ * 商品情報を新規登録する処理
+ *
+ * @returns レスポンス JSON
+ */
 createNewTask = async function(reqBody){
     let connection = null;
     try {
