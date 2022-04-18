@@ -58,6 +58,14 @@ $(async function () {
                 <span class="created-date ${stripe}">${dateString}</span>
               </div>
               <button
+                class="todo-detail btn btn-success col col-1"
+                data-detail_id="${item.id}"
+                data-target="#detailModal"
+                data-toggle="modal"
+              >
+                詳細
+              </button>
+              <button
                 type="button"
                 class="btn btn-primary todo-update col col-1"
                 data-toggle="modal"
@@ -85,6 +93,60 @@ $(async function () {
   $("#todo-list").append(list);
 });
 
+// Get Task Detail
+$(document).on('click',".todo-detail", async function(){
+  let detail_id = $(this).data("detail_id");
+  let data = await httpGet("//" + window.location.host + "/api/items/" + detail_id);
+  $("#detail-name").text(data[0].task_name);
+  let dateString;
+  if(!data[0].task_deadline){
+    dateString = 'なし';
+  }else{
+    let deadline = new Date(data[0].deadline);
+    let year = deadline.getFullYear() + 1;
+    let month = deadline.getMonth();
+    let date = deadline.getDate();
+    dateString = year+"年"+month+"月"+date+"日";
+  }
+  $("#detail-deadline").text(`期限: ${dateString}`);
+
+  let category_id = data[0].category_id;
+  let category;
+  switch (category_id) {
+    case '1':
+      category = '生活';
+      break;
+    case '2':
+      category = '勉強';
+      break;
+    case '3':
+      category = '仕事';
+      break;
+    case '4':
+      category = '趣味';
+      break;
+    default:
+      category = '該当なし';
+      break;
+  }
+  $("#detail-category").text(`カテゴリー: ${category}`);
+  let task_status = data[0].task_status;
+  switch (task_status) {
+    case 1:
+      task_status = '完了';
+      break;
+    case 2:
+      task_status = '実施中';
+      break;
+    case 3:
+      task_status = '未実施';
+      break;
+    default:
+      task_status = '不明';
+      break;
+  }
+  $("#detail-status").text(`実施状況: ${task_status}`);
+});
 
 // Create New Task
 $("#create-task").click( async function(){
@@ -258,6 +320,14 @@ $("#search-icon").click( async function(){
                 <span class="created-date ${stripe}">${dateString}</span>
               </div>
               <button
+                class="todo-detail btn btn-success col col-1"
+                data-detail_id="${item.id}"
+                data-target="#detailModal"
+                data-toggle="modal"
+              >
+                詳細
+              </button>
+              <button
                 type="button"
                 class="btn btn-primary todo-update col col-1"
                 data-toggle="modal"
@@ -345,6 +415,14 @@ $("[name=category_filter]").on("change", async function(){
                 <span class="created-date ${stripe}">${dateString}</span>
               </div>
               <button
+                class="todo-detail btn btn-success col col-1"
+                data-detail_id="${item.id}"
+                data-target="#detailModal"
+                data-toggle="modal"
+              >
+                詳細
+              </button>
+              <button
                 type="button"
                 class="btn btn-primary todo-update col col-1"
                 data-toggle="modal"
@@ -412,6 +490,14 @@ $("[name=sort-by]").on("change", async function(){
                 <span class="todo-text ${stripe}">${item.task_name}</span>
                 <span class="created-date ${stripe}">${dateString}</span>
               </div>
+              <button
+                class="todo-detail btn btn-success col col-1"
+                data-detail_id="${item.id}"
+                data-target="#detailModal"
+                data-toggle="modal"
+              >
+                詳細
+              </button>
               <button
                 type="button"
                 class="btn btn-primary todo-update col col-1"

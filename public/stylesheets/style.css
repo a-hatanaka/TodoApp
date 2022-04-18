@@ -100,7 +100,8 @@ li {
 }
 
 .todo-update,
-.todo-delete {
+.todo-delete,
+.todo-detail {
   border-radius: 0;
   text-emphasis: right;
   font-size: 1rem;

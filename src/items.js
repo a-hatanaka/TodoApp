@@ -12,7 +12,7 @@ getListItem = async function () {
   try {
     connection = await mysql.createConnection(config.dbSetting);
     // SQL記述
-    const sql = "SELECT * FROM t_task LEFT JOIN m_category ON t_task.category_id = m_category.id";
+    const sql = "SELECT * FROM t_task LEFT JOIN m_category ON t_task.category_id = m_category.category_id";
     let data = [];
     const [rows, fields] = await connection.query(sql, data);
     return rows;
