@@ -1,7 +1,13 @@
 const mysql = require("mysql2/promise");
 const config = require("../../config.js");
-// 1件のデータ削除処理
 
+
+/**
+ * deleteTask
+ * 1件のデータ削除処理
+ *
+ * @returns レスポンス JSON
+ */
 deleteTask = async function(id){
     let connection = null;
     try {

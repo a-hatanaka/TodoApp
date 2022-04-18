@@ -6,14 +6,25 @@ function escapeHTML(s) {
     .replace(/'/g, "&#39;" );
 }
 
+$(function() {
+  $(".datepicker").datepicker();
+  $(".datepicker").datepicker("option", "dateFormat", 'yy/mm/dd' );
+});
+
 // タスク一覧取得API
 $(async function () {
   const data = await httpGet("//" + window.location.host + "/api/items");
   console.log(data);
   const list = data.map((item) => {
+    console.log(item.category_name);
     let dateString='';
+    let timeOut = '';
     if(item.deadline!==null){
       var deadline = new Date(item.deadline);
+      if(deadline < new Date()){
+        timeOut = 'time-out';
+        console.log(item.task_name+"is time out.");
+      }
       console.log(deadline);
       var year = deadline.getFullYear();
       var month = deadline.getMonth() +1;
@@ -25,27 +36,25 @@ $(async function () {
     let checkIcon = '';
     let stripe = '';
     let backGray = '';
-    let blueTag = '';
-    let grayTag = '';
-    let redTag = '';
+    let tag = '';
     let completed_task = '';
-    console.log(item.task_status);
     if(item.task_status===1){
       checkIcon = "<i class='task-complete bi bi-check-circle'></i>";
       stripe = 'stripe';
       backGray = 'backGray';
-      grayTag = 'grayTag';
+      tag = 'grayTag';
       completed_task = 'completed_task';
     }else if(item.task_status===2){
-      blueTag = 'blueTag';
+      tag = 'blueTag';
     }else{
-      redTag = 'redTag';
+      tag = 'redTag';
     }
-    return `<li class="justify-content-md-center ${completed_task}">
+    return `<li class="justify-content-md-center ${completed_task} ${timeOut}">
               ${checkIcon}
-              <span class="${redTag} ${blueTag} ${grayTag}"></span>
+              <span class="${tag}"></span>
               <div class="list-content col col-10 ${backGray}">
                 <span class="todo-text ${stripe}">${item.task_name}</span>
+                <span>${timeOut}</span>
                 <span class="created-date ${stripe}">${dateString}</span>
               </div>
               <button
@@ -230,22 +239,20 @@ $("#search-icon").click( async function(){
     let checkIcon = '';
     let stripe = '';
     let backGray = '';
-    let blueTag = '';
-    let grayTag = '';
-    let redTag = '';
+    let tag = '';
     if(item.task_status===1){
       checkIcon = "<i class='task-complete bi bi-check-circle'></i>";
       stripe = 'stripe';
       backGray = 'backGray';
-      grayTag = 'grayTag';
+      tag = 'grayTag';
     }else if(item.task_status===2){
-      blueTag = 'blueTag';
+      tag = 'blueTag';
     }else{
-      redTag = 'redTag';
+      tag = 'redTag';
     }
     return `<li class="justify-content-md-center">
               ${checkIcon}
-              <span class="${redTag} ${blueTag} ${grayTag}"></span>
+              <span class="${tag}"></span>
               <div class="list-content col col-10 ${backGray}">
                 <span class="todo-text ${stripe}">${item.task_name}</span>
                 <span class="created-date ${stripe}">${dateString}</span>
@@ -285,15 +292,25 @@ $("#search-icon").click( async function(){
 $("[name=category_filter]").on("change", async function(){
   $("[name=task-search]").val('');
   const categoryId = $("[name=category_filter]").val();
-  const data = await httpGet(
-    "//" + window.location.host + "/api/category/" + categoryId
-  );
-  if(data.length===0){
-    alert("カテゴリーに一致するタスクはありません。");
+  let data;
+  let filteredList;
+  if(categoryId === '0'){
+    data = await httpGet(
+      "//" + window.location.host + "/api/items"
+    );
+    $("#todo-list").empty();
+    console.log(data);
+  }else{
+    data = await httpGet(
+      "//" + window.location.host + "/api/category/" + categoryId
+    );
+    $("#todo-list").empty();
+    console.log(data);
+    if(data.length===0){
+      alert("カテゴリーに一致するタスクはありません。");
+    }
   }
-  $("#todo-list").empty();
-  console.log(data);
-  const filteredList = data.map((item) => {
+  filteredList = data.map((item) => {
     let dateString='';
     if(item.deadline!==null){
       var deadline = new Date(item.deadline);
@@ -308,23 +325,21 @@ $("[name=category_filter]").on("change", async function(){
     let checkIcon = '';
     let stripe = '';
     let backGray = '';
-    let blueTag = '';
-    let grayTag = '';
-    let redTag = '';
+    let tag = '';
     console.log(item.task_status);
     if(item.task_status===1){
       checkIcon = "<i class='task-complete bi bi-check-circle'></i>";
       stripe = 'stripe';
       backGray = 'backGray';
-      grayTag = 'grayTag';
+      tag = 'grayTag';
     }else if(item.task_status===2){
-      blueTag = 'blueTag';
+      tag = 'blueTag';
     }else{
-      redTag = 'redTag';
+      tag = 'redTag';
     }
     return `<li class="justify-content-md-center">
               ${checkIcon}
-              <span class="${redTag} ${blueTag} ${grayTag}"></span>
+              <span class="${tag}"></span>
               <div class="list-content col col-10 ${backGray}">
                 <span class="todo-text ${stripe}">${item.task_name}</span>
                 <span class="created-date ${stripe}">${dateString}</span>
@@ -379,22 +394,20 @@ $("[name=sort-by]").on("change", async function(){
     let checkIcon = '';
     let stripe = '';
     let backGray = '';
-    let blueTag = '';
-    let grayTag = '';
-    let redTag = '';
+    let tag = '';
     if(item.task_status===1){
       checkIcon = "<i class='task-complete bi bi-check-circle'></i>";
       stripe = 'stripe';
       backGray = 'backGray';
-      grayTag = 'grayTag';
+      tag = 'grayTag';
     }else if(item.task_status===2){
-      blueTag = 'blueTag';
+      tag = 'blueTag';
     }else{
-      redTag = 'redTag';
+      tag = 'redTag';
     }
     return `<li class="justify-content-md-center">
               ${checkIcon}
-              <span class="${redTag} ${blueTag} ${grayTag}"></span>
+              <span class="${tag}"></span>
               <div class="list-content col col-10 ${backGray}">
                 <span class="todo-text ${stripe}">${item.task_name}</span>
                 <span class="created-date ${stripe}">${dateString}</span>
@@ -427,8 +440,8 @@ $("[name=sort-by]").on("change", async function(){
   $("#todo-list").append(filteredList);
 });
 
-// Hide completed task.
 
+// Hide completed task.
 $("#completed-hide").on("click",function(){
   if(!$(this).hasClass("active")){
     $(this).addClass("active");
