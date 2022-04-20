@@ -9,8 +9,8 @@ const config = require("../../config.js");
  * @returns レスポンス JSON
  */
 updateTask = async function(id, reqBody){
-let connection = null;
-console.log(id);
+  let connection = null;
+  console.log(id);
   try {
     connection = await mysql.createConnection(config.dbSetting);
     // SQL記述
@@ -26,4 +26,29 @@ console.log(id);
   }
 }
 
+updateStatus = async function(id){
+  let connection = null;
+  let [task_id,currentStatus] = id.split("-");
+  try {
+    connection = await mysql.createConnection(config.dbSetting);
+    // SQL記述
+    let sql;
+    let data;
+    if(currentStatus==='2' || currentStatus ==='3'){
+      sql = "UPDATE t_task SET task_status=1, updated_at= CURRENT_TIMESTAMP  WHERE id=?";
+      data = [task_id];
+    }else{
+      sql = "UPDATE t_task SET task_status=2, updated_at= CURRENT_TIMESTAMP  WHERE id=?";
+      data = [task_id];
+    }
+    const [rows, fields] = await connection.query(sql, data);
+    return rows;
+  } catch (error) {
+    console.log(error);
+  } finally {
+    connection.end();
+  }
+};
+
 exports.updateTask = updateTask;
+exports.updateStatus = updateStatus;

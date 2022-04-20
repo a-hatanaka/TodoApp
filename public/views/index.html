@@ -22,6 +22,27 @@
     <title>Todoアプリ</title>
   </head>
   <body>
+
+    <table id="calendar">
+      <span id="calen-year"></span><span id="calen-month"></span>
+      <tr>
+        <th>  Sun</th>
+        <th>  Mon</th>
+        <th>  Tue</th>
+        <th>  Wed</th>
+        <th>  Thi</th>
+        <th>  Fri</th>
+        <th>  Sat</th>
+      </tr>
+    </table>
+
+
+    <div class="return-home" onclick="reloadPage()">
+      一覧
+    </div>
+    <div id="today-tasks">
+      今日が期限のタスク
+    </div>
     <div class="container">
       <!-- Content here -->
       <div id="main-contents">
@@ -59,9 +80,9 @@
           <input name="task-search" type="text" placeholder="タスク検索">
           <i class="bi bi-search" id="search-icon"></i>
         </div>
-
+        <br><br>
+        <button id="completed-hide">完了タスクをカスク</button>
         <ul id="todo-list">
-          <button id="completed-hide">完了タスクをカスク</button>
           <!-- APIで取得したdataを処理したものが入る(appendされる) -->
         </ul>
         <ul id="unlimited-todo">
@@ -283,6 +304,9 @@
       </div>
     </div>
 
+    
+
+
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script
@@ -304,6 +328,62 @@
     <script src="../javascripts/index.js"></script>
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    
+    <script>
+      function reloadPage(){
+        location.reload();
+      }
+
+
+      $(function(){
+        let today = new Date();
+        let thisMonth = today.getMonth()+1;
+        let firstDay = today.setDate(1);
+        let weekOfFirst = today.getDay();
+        let skipWeek = 0;
+        switch (weekOfFirst) {
+          case 1:
+            skipWeek = 1;
+            break;
+          case 2:
+            skipWeek = 2;
+            break;
+          case 3:
+          skipWeek = 3;
+            break;
+          case 4:
+          skipWeek = 4;
+            break;
+          case 5:
+          skipWeek = 5;
+            break;
+          case 6:
+          skipWeek = 6;
+            break;
+          default:
+  
+            break;
+        }
+        let currentRow = 1;
+        let tables = '';
+        let days = 1;
+        for(let i =1;i<=5;i++){
+          tables += "<tr>";
+          for(let j =1;j<=7;j++){
+            if(currentRow===1 && j<skipWeek){
+              tables += "<th> </th>";
+            }else if(days>31){
+              break;
+            }else{
+              tables += `<th>${ days}</th>`;
+              ++days;
+            }
+          }
+          tables += "</tr><br>";
+          ++currentRow;
+        }
+        $("#calendar").append(tables);
+        return;
+      });
+    </script>
   </body>
 </html>
