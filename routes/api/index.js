@@ -19,6 +19,12 @@ router.get("/items/:id", async function (req, res, next) {
   res.send(item);
 });
 
+// 今日の日付
+router.get("/today", async function(res,res,next){
+  const todayTasks = await items.getTodayTask();
+  res.send(todayTasks);
+});
+
 // filtering by category_id
 router.get("/category/:category_id", async function(req,res,next){
   const filteredItem = await items.categoryFilter(req.params.category_id);

@@ -127,6 +127,27 @@ searchItem = async function(keyword){
   }
 }
 
+/**
+ * getTodayTask
+ * 商品情報を１件返却する処理
+ *
+ * @returns レスポンス JSON
+ */
+getTodayTask = async function () {
+  let connection = null;
+  try {
+    connection = await mysql.createConnection(config.dbSetting);
+    // SQL記述
+    const sql = "SELECT * FROM t_task WHERE deadline >= CURDATE()  AND deadline < DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY)";
+    const [rows, fields] = await connection.query(sql);
+    return rows;
+  } catch (error) {
+    console.log(error);
+  } finally {
+    connection.end();
+  }
+};
+
 
 
 exports.getListItem = getListItem;
@@ -134,3 +155,4 @@ exports.getItem = getItem;
 exports.categoryFilter = categoryFilter;
 exports.searchItem = searchItem;
 exports.sortTasks = sortTasks;
+exports.getTodayTask = getTodayTask;

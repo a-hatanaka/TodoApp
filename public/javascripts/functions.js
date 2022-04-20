@@ -14,90 +14,16 @@ $(function() {
 // タスク一覧取得API
 $(async function () {
   const data = await httpGet("//" + window.location.host + "/api/items");
+  $("#todo-list").empty();
   console.log(data);
-  const list = data.map((item) => {
-    console.log(item.category_name);
-    let dateString='';
-    let timeOut = '';
-    if(item.deadline!==null){
-      var deadline = new Date(item.deadline);
-      if(deadline < new Date()){
-        timeOut = 'time-out';
-        console.log(item.task_name+"is time out.");
-      }
-      console.log(deadline);
-      var year = deadline.getFullYear();
-      var month = deadline.getMonth() +1;
-      var day = deadline.getDate();
-      dateString = year+'年'+month+'月'+day+'日';
-    }else {
-      dateString = '期限設定なし';
-    }
-    let checkIcon = '';
-    let stripe = '';
-    let backGray = '';
-    let tag = '';
-    let completed_task = '';
-    if(item.task_status===1){
-      checkIcon = "<i class='task-complete bi bi-check-circle'></i>";
-      stripe = 'stripe';
-      backGray = 'backGray';
-      tag = 'grayTag';
-      completed_task = 'completed_task';
-    }else if(item.task_status===2){
-      tag = 'blueTag';
-    }else{
-      tag = 'redTag';
-    }
-    return `<li class="justify-content-md-center ${completed_task} ${timeOut}">
-              ${checkIcon}
-              <span class="${tag}"></span>
-              <div class="list-content col col-10 ${backGray}">
-                <span class="todo-text ${stripe}">${item.task_name}</span>
-                <span>${timeOut}</span>
-                <span class="created-date ${stripe}">${dateString}</span>
-              </div>
-              <button
-                class="todo-detail btn btn-success col col-1"
-                data-detail_id="${item.id}"
-                data-target="#detailModal"
-                data-toggle="modal"
-              >
-                詳細
-              </button>
-              <button
-                type="button"
-                class="btn btn-primary todo-update col col-1"
-                data-toggle="modal"
-                data-target="#exampleModal2"
-                data-task_id="${item.id}"
-                data-task_name="${item.task_name}"
-                data-deadline="${dateString}"
-                data-task_status="${item.task_status}"
-                data-cate_id="${item.category_id}"
-              >
-                更新
-              </button>
-              <button
-                type="button"
-                class="btn btn-danger todo-delete col col-1"
-                data-toggle="modal"
-                data-target="#exampleModalCenter"
-                data-id="${item.id}"
-                data-task_name="${item.task_name}"
-              >
-                削除
-              </button>
-            </li>`;
-  });
-  $("#todo-list").append(list);
+  $("#todo-list").append(getList(data));
 });
 
 // Get Task Detail
 $(document).on('click',".todo-detail", async function(){
   let detail_id = $(this).data("detail_id");
   let data = await httpGet("//" + window.location.host + "/api/items/" + detail_id);
-  $("#detail-name").text(data[0].task_name);
+  $("#detail-name").text(`タスク名: ${data[0].task_name}`);
   let dateString;
   if(!data[0].task_deadline){
     dateString = 'なし';
@@ -285,77 +211,7 @@ $("#search-icon").click( async function(){
   );
   $("#todo-list").empty();
   console.log(data);
-
-  const searchedList = data.map((item) => {
-    let dateString='';
-    if(item.deadline!==null){
-      var deadline = new Date(item.deadline);
-      console.log(deadline);
-      var year = deadline.getFullYear();
-      var month = deadline.getMonth() +1;
-      var day = deadline.getDate();
-      dateString = year+'年'+month+'月'+day+'日';
-    }else {
-      dateString = '期限設定なし';
-    }
-    let checkIcon = '';
-    let stripe = '';
-    let backGray = '';
-    let tag = '';
-    if(item.task_status===1){
-      checkIcon = "<i class='task-complete bi bi-check-circle'></i>";
-      stripe = 'stripe';
-      backGray = 'backGray';
-      tag = 'grayTag';
-    }else if(item.task_status===2){
-      tag = 'blueTag';
-    }else{
-      tag = 'redTag';
-    }
-    return `<li class="justify-content-md-center">
-              ${checkIcon}
-              <span class="${tag}"></span>
-              <div class="list-content col col-10 ${backGray}">
-                <span class="todo-text ${stripe}">${item.task_name}</span>
-                <span class="created-date ${stripe}">${dateString}</span>
-              </div>
-              <button
-                class="todo-detail btn btn-success col col-1"
-                data-detail_id="${item.id}"
-                data-target="#detailModal"
-                data-toggle="modal"
-              >
-                詳細
-              </button>
-              <button
-                type="button"
-                class="btn btn-primary todo-update col col-1"
-                data-toggle="modal"
-                data-target="#exampleModal2"
-                data-task_id="${item.id}"
-                data-task_name="${item.task_name}"
-                data-deadline="${dateString}"
-                data-task_status="${item.task_status}"
-                data-cate_id="${item.category_id}"
-              >
-                更新
-              </button>
-              <button
-                type="button"
-                class="btn btn-danger todo-delete col col-1"
-                data-toggle="modal"
-                data-target="#exampleModalCenter"
-                data-id="${item.id}"
-                data-task_name="${item.task_name}"
-              >
-                削除
-              </button>
-            </li>`;
-  });
-  $("#todo-list").append(
-    `検索ワード「${keyword}」を探した結果、\n${data.length}件のタスクがありました。`
-  );
-  $("#todo-list").append(searchedList);
+  $("#todo-list").append(getList(data));
 });
 
 // filtering by category
@@ -363,7 +219,6 @@ $("[name=category_filter]").on("change", async function(){
   $("[name=task-search]").val('');
   const categoryId = $("[name=category_filter]").val();
   let data;
-  let filteredList;
   if(categoryId === '0'){
     data = await httpGet(
       "//" + window.location.host + "/api/items"
@@ -380,74 +235,8 @@ $("[name=category_filter]").on("change", async function(){
       alert("カテゴリーに一致するタスクはありません。");
     }
   }
-  filteredList = data.map((item) => {
-    let dateString='';
-    if(item.deadline!==null){
-      var deadline = new Date(item.deadline);
-      console.log(deadline);
-      var year = deadline.getFullYear();
-      var month = deadline.getMonth() +1;
-      var day = deadline.getDate();
-      dateString = year+'年'+month+'月'+day+'日';
-    }else {
-      dateString = '期限設定なし';
-    }
-    let checkIcon = '';
-    let stripe = '';
-    let backGray = '';
-    let tag = '';
-    console.log(item.task_status);
-    if(item.task_status===1){
-      checkIcon = "<i class='task-complete bi bi-check-circle'></i>";
-      stripe = 'stripe';
-      backGray = 'backGray';
-      tag = 'grayTag';
-    }else if(item.task_status===2){
-      tag = 'blueTag';
-    }else{
-      tag = 'redTag';
-    }
-    return `<li class="justify-content-md-center">
-              ${checkIcon}
-              <span class="${tag}"></span>
-              <div class="list-content col col-10 ${backGray}">
-                <span class="todo-text ${stripe}">${item.task_name}</span>
-                <span class="created-date ${stripe}">${dateString}</span>
-              </div>
-              <button
-                class="todo-detail btn btn-success col col-1"
-                data-detail_id="${item.id}"
-                data-target="#detailModal"
-                data-toggle="modal"
-              >
-                詳細
-              </button>
-              <button
-                type="button"
-                class="btn btn-primary todo-update col col-1"
-                data-toggle="modal"
-                data-target="#exampleModal2"
-                data-task_id="${item.id}"
-                data-task_name="${item.task_name}"
-                data-deadline="${dateString}"
-                data-task_status="${item.task_status}"
-                data-cate_id="${item.category_id}"
-              >
-                更新
-              </button>
-              <button
-                type="button"
-                class="btn btn-danger todo-delete col col-1"
-                data-toggle="modal"
-                data-target="#exampleModalCenter"
-                data-id="${item.id}"
-                data-task_name="${item.task_name}"
-              >
-                削除
-              </button>
-            </li>`;
-  });
-  $("#todo-list").append(filteredList);
+  console.log(data);
+  $("#todo-list").append(getList(data));
 });
 
 // sort tasks
@@ -457,73 +246,8 @@ $("[name=sort-by]").on("change", async function(){
     "//" + window.location.host + "/api/sort/" + sortBy
   );
   $("#todo-list").empty();
-  const filteredList = data.map((item) => {
-    let dateString='';
-    if(item.deadline!==null){
-      var deadline = new Date(item.deadline);
-      console.log(deadline);
-      var year = deadline.getFullYear();
-      var month = deadline.getMonth() +1;
-      var day = deadline.getDate();
-      dateString = year+'年'+month+'月'+day+'日';
-    }else {
-      dateString = '期限設定なし';
-    }
-    let checkIcon = '';
-    let stripe = '';
-    let backGray = '';
-    let tag = '';
-    if(item.task_status===1){
-      checkIcon = "<i class='task-complete bi bi-check-circle'></i>";
-      stripe = 'stripe';
-      backGray = 'backGray';
-      tag = 'grayTag';
-    }else if(item.task_status===2){
-      tag = 'blueTag';
-    }else{
-      tag = 'redTag';
-    }
-    return `<li class="justify-content-md-center">
-              ${checkIcon}
-              <span class="${tag}"></span>
-              <div class="list-content col col-10 ${backGray}">
-                <span class="todo-text ${stripe}">${item.task_name}</span>
-                <span class="created-date ${stripe}">${dateString}</span>
-              </div>
-              <button
-                class="todo-detail btn btn-success col col-1"
-                data-detail_id="${item.id}"
-                data-target="#detailModal"
-                data-toggle="modal"
-              >
-                詳細
-              </button>
-              <button
-                type="button"
-                class="btn btn-primary todo-update col col-1"
-                data-toggle="modal"
-                data-target="#exampleModal2"
-                data-task_id="${item.id}"
-                data-task_name="${item.task_name}"
-                data-deadline="${dateString}"
-                data-task_status="${item.task_status}"
-                data-cate_id="${item.category_id}"
-              >
-                更新
-              </button>
-              <button
-                type="button"
-                class="btn btn-danger todo-delete col col-1"
-                data-toggle="modal"
-                data-target="#exampleModalCenter"
-                data-id="${item.id}"
-                data-task_name="${item.task_name}"
-              >
-                削除
-              </button>
-            </li>`;
-  });
-  $("#todo-list").append(filteredList);
+  console.log(data);
+  $("#todo-list").append(getList(data));
 });
 
 
@@ -540,7 +264,187 @@ $("#completed-hide").on("click",function(){
   }
 });
 
+// 日付のフォーマットに関する検証に利用
 function inputError(where,message){
   $(where).text(message).css("color", "red");
   console.log("Error output works!");
+}
+
+// タスクリスト取得 一覧表示、サーチ、カテゴリー分類、ソートなどでしよう
+function getList(data){
+  let tasks = [];
+  let alertedTasks = [];
+  let unlimitedTasks = [];
+  data.map((item)=>{
+    let dateString='';
+    let timeOut = '';
+    let deadlineAlert = '';
+    let alertString = '';
+    if(item.deadline!==null){
+      let deadline = new Date(item.deadline);
+      let today = new Date();
+      if(deadline < today){
+        timeOut = 'time-out';
+        console.log(item.task_name+"is time out.");
+      }else if((deadline.getTime()-today.getTime())/1000 < 86400){
+        deadlineAlert = 'deadline-alert';
+        alertString = '期限間近!!';
+      }
+      let year = deadline.getFullYear();
+      let month = deadline.getMonth() +1;
+      let day = deadline.getDate();
+      dateString = year+'年'+month+'月'+day+'日';
+    }else {
+      dateString = '期限設定なし';
+    }
+    let checkIcon = '';
+    let stripe = '';
+    let backGray = '';
+    let tag = '';
+    let completed_task = '';
+    if(item.task_status===1){
+      checkIcon = "<i class='task-complete bi bi-check-circle'></i>";
+      stripe = 'stripe';
+      backGray = 'backGray';
+      tag = 'grayTag';
+      completed_task = 'completed_task';
+    }else if(item.task_status===2){
+      tag = 'blueTag';
+    }else{
+      tag = 'redTag';
+    }
+
+    if(deadlineAlert!==''){
+      alertedTasks.push(
+        `<li class="justify-content-md-center ${completed_task} ${timeOut} ${deadlineAlert}">
+        ${checkIcon}
+        <span class="${tag}"></span>
+        <div class="list-content col col-10 ${backGray}">
+          <span class="todo-text ${stripe}">${item.task_name}</span>
+          <span>${timeOut}${alertString}</span>
+          <span class="created-date ${stripe}">${dateString}</span>
+        </div>
+        <button
+          class="todo-detail btn btn-success col col-1"
+          data-detail_id="${item.id}"
+          data-target="#detailModal"
+          data-toggle="modal"
+        >
+          詳細
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary todo-update col col-1"
+          data-toggle="modal"
+          data-target="#exampleModal2"
+          data-task_id="${item.id}"
+          data-task_name="${item.task_name}"
+          data-deadline="${dateString}"
+          data-task_status="${item.task_status}"
+          data-cate_id="${item.category_id}"
+        >
+          更新
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger todo-delete col col-1"
+          data-toggle="modal"
+          data-target="#exampleModalCenter"
+          data-id="${item.id}"
+          data-task_name="${item.task_name}"
+        >
+          削除
+        </button>
+        </li>`
+      );
+    }else if(item.deadline===null){
+      unlimitedTasks.push(
+        `<li class="justify-content-md-center ${completed_task} ${timeOut} ${deadlineAlert}">
+        ${checkIcon}
+        <span class="${tag}"></span>
+        <div class="list-content col col-10 ${backGray}">
+          <span class="todo-text ${stripe}">${item.task_name}</span>
+          <span>${timeOut}</span>
+          <span class="created-date ${stripe}">${dateString}</span>
+        </div>
+        <button
+          class="todo-detail btn btn-success col col-1"
+          data-detail_id="${item.id}"
+          data-target="#detailModal"
+          data-toggle="modal"
+        >
+          詳細
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary todo-update col col-1"
+          data-toggle="modal"
+          data-target="#exampleModal2"
+          data-task_id="${item.id}"
+          data-task_name="${item.task_name}"
+          data-deadline="${dateString}"
+          data-task_status="${item.task_status}"
+          data-cate_id="${item.category_id}"
+        >
+          更新
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger todo-delete col col-1"
+          data-toggle="modal"
+          data-target="#exampleModalCenter"
+          data-id="${item.id}"
+          data-task_name="${item.task_name}"
+        >
+          削除
+        </button>
+        </li>`
+      );
+    }else{
+      tasks.push(
+        `<li class="justify-content-md-center ${completed_task} ${timeOut} ${deadlineAlert}">
+        ${checkIcon}
+        <span class="${tag}"></span>
+        <div class="list-content col col-10 ${backGray}">
+          <span class="todo-text ${stripe}">${item.task_name}</span>
+          <span>${timeOut}</span>
+          <span class="created-date ${stripe}">${dateString}</span>
+        </div>
+        <button
+          class="todo-detail btn btn-success col col-1"
+          data-detail_id="${item.id}"
+          data-target="#detailModal"
+          data-toggle="modal"
+        >
+          詳細
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary todo-update col col-1"
+          data-toggle="modal"
+          data-target="#exampleModal2"
+          data-task_id="${item.id}"
+          data-task_name="${item.task_name}"
+          data-deadline="${dateString}"
+          data-task_status="${item.task_status}"
+          data-cate_id="${item.category_id}"
+        >
+          更新
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger todo-delete col col-1"
+          data-toggle="modal"
+          data-target="#exampleModalCenter"
+          data-id="${item.id}"
+          data-task_name="${item.task_name}"
+        >
+          削除
+        </button>
+        </li>`
+      );
+    }
+    return;
+  });
+  return [...alertedTasks,...tasks,...unlimitedTasks].join('');
 }
