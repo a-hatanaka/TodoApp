@@ -148,6 +148,41 @@ getTodayTask = async function () {
   }
 };
 
+getMonthlyTasks = async function(){
+  let connection = null;
+  try {
+    connection = await mysql.createConnection(config.dbSetting);
+    let today = new Date();
+    let thisYear = today.getFullYear();
+    let thisMonth = today.getMonth()+1;
+    today.setHours(0);
+    today.setMinutes(0);
+    today.setSeconds(0);
+    let duplicatedToday = today;
+
+    // 月の初日を取得
+    today.setDate(1);
+    let firstDayOfMonth = today.getDate();
+    
+    // 月の末日を取得
+    duplicatedToday.setMonth(duplicatedToday.getMonth()+1);
+    duplicatedToday.setDate(0);
+    let lastDayOfMonth = duplicatedToday.getDate();
+
+    let minDate = `${thisYear}-${thisMonth}-${firstDayOfMonth}`;
+    let maxDate = `${thisYear}-${thisMonth}-${lastDayOfMonth}`;
+    // SQL記述
+    const sql = "SELECT task_name, CAST(deadline AS DATE) AS deadline, task_status,category_id FROM t_task WHERE deadline >= ? AND deadline < ? ORDER BY deadline";
+    let data = [minDate,maxDate];
+    const [rows, fields] = await connection.query(sql,data);
+    return rows;
+  } catch (error) {
+    console.log(error);
+  } finally {
+    connection.end();
+  }
+}
+
 
 
 exports.getListItem = getListItem;
@@ -156,3 +191,4 @@ exports.categoryFilter = categoryFilter;
 exports.searchItem = searchItem;
 exports.sortTasks = sortTasks;
 exports.getTodayTask = getTodayTask;
+exports.getMonthlyTasks = getMonthlyTasks;

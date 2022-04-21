@@ -48,6 +48,12 @@ router.get("/search/:keyword", async function(req,res,next){
   res.send(searchedItem);
 });
 
+// カレンダー表示用タスク
+router.get("/calendar", async function(req,res,next){
+  const monthlyTasks = await items.getMonthlyTasks();
+  console.log(monthlyTasks);
+  res.send(monthlyTasks);
+});
 
 // 新規タスク登録
 router.post("/tasks", function(req,res,next){

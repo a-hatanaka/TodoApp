@@ -345,7 +345,6 @@ function getList(data){
       if(deadline < today){
         timeOut = 'time-out';
         uncompleteIcon = '';
-        console.log(item.task_name+"is time out.");
       }else if((deadline.getTime()-today.getTime())/1000 < 86400){
         deadlineAlert = 'deadline-alert';
         alertString = '期限間近!!';

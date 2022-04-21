@@ -245,7 +245,33 @@ li {
 #calendar {
   border: black 1px;
 }
-th {
-  border: black;
-  
+
+table, td, th {
+  border: 2px black solid;
+  text-align: center;
+}
+
+td {
+  width: 150px;
+  height: 150px;
+}
+td p {
+  text-align: center;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  /* position: relative;
+  top: -35%; */
+  vertical-align: top !important;
+}
+
+#calendar-modal .modal-content {
+  position: fixed !important;
+  top: 5%;
+  left: 10vw;
+  overflow: auto;
+  width: 80vw !important;
+  height: 90vh !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 20px;
 }
