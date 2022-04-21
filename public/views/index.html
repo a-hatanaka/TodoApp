@@ -22,6 +22,17 @@
     <title>Todoアプリ</title>
   </head>
   <body>
+
+    <button id="open-calendar" type="button" class="btn btn-primary" data-toggle="modal" data-target="#calendar-modal">
+      カレンダー表示
+    </button>
+
+    <div class="return-home" onclick="reloadPage()">
+      一覧
+    </div>
+    <div id="today-tasks">
+      今日が期限のタスク
+    </div>
     <div class="container">
       <!-- Content here -->
       <div id="main-contents">
@@ -59,10 +70,13 @@
           <input name="task-search" type="text" placeholder="タスク検索">
           <i class="bi bi-search" id="search-icon"></i>
         </div>
-
+        <br><br>
+        <button id="completed-hide">完了タスクをカスク</button>
         <ul id="todo-list">
-          <button id="completed-hide">完了タスクをカスク</button>
           <!-- APIで取得したdataを処理したものが入る(appendされる) -->
+        </ul>
+        <ul id="unlimited-todo">
+
         </ul>
       </div>
     </div>
@@ -280,6 +294,33 @@
       </div>
     </div>
 
+    
+    
+    <!-- Modal -->
+    <div class="modal fade" id="calendar-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <h2 id="year-month">締切カレンダー</h2>
+            <table id="calendar">
+              <span id="calen-year"></span><span id="calen-month"></span>
+              <tr>
+                <th>  Sun</th>
+                <th>  Mon</th>
+                <th>  Tue</th>
+                <th>  Wed</th>
+                <th>  Thi</th>
+                <th>  Fri</th>
+                <th>  Sat</th>
+              </tr>
+            </table>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script
@@ -301,5 +342,106 @@
     <script src="../javascripts/index.js"></script>
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<<<<<<< HEAD
+=======
+    <script>
+      function reloadPage(){
+        location.reload();
+      }
+
+
+      $("#open-calendar").click( async function(){
+        let today = new Date();
+        let thisYear = today.getFullYear();
+        let thisMonth = today.getMonth()+1;
+        let firstDay = today.setDate(1);
+        let weekOfFirst = today.getDay();
+        let lastDayOfMonth = getLastDay();
+        let skipWeek = 0;
+        switch (weekOfFirst) {
+          case 1:
+            skipWeek = 1;
+            break;
+          case 2:
+            skipWeek = 2;
+            break;
+          case 3:
+          skipWeek = 3;
+            break;
+          case 4:
+          skipWeek = 4;
+            break;
+          case 5:
+          skipWeek = 5;
+            break;
+          case 6:
+          skipWeek = 6;
+            break;
+          default:
+
+            break;
+        }
+        
+        let monthlyTasks = await httpGet("//" + window.location.host + "/api/calendar/");
+        let taskArray = [];
+        let date;
+        monthlyTasks.map(function(item){
+          console.log(item);
+          // 日付のみ取得したいが、deadlineのバリューは、2022-04-19 11:21:11などの
+          // 不要な要素が多い。よって、splitで"-"で区切り配列に、その[2]の要素を文文字列分割で、２文字だけ取り出したのが、日付。
+          date = item.deadline.split("-")[2].substr(0,2);
+          if(taskArray[date]===undefined){
+            taskArray[date] = [];
+          }
+          taskArray[date].push(item);
+          return;
+        });
+        let currentRow = 1;
+        let tables = '';
+        let days = 1;
+        let tasksString;
+        let task_status;
+        for(let i =1;i<=5;i++){
+          
+          tables += "<tr>";
+          for(let j =1;j<=7;j++){
+            tasksString = '';
+            if(currentRow===1 && j<skipWeek){
+              tables += "<td> </td>";
+            }else if(days>lastDayOfMonth){
+              break;
+            }else{
+              if(taskArray[days]!==undefined){
+                taskArray[days].forEach(task => {
+                  if(task.task_status===1){
+                    task_status = "完了";
+                  }else if(task.task_status===2){
+                    task_status = "実施中";
+                  }else{
+                    task_status = "未実施";
+                  }
+                  tasksString += `・${task.task_name}(${task_status})<br>`;
+                });
+              }
+              tables += `<td><p><strong>${ days}</strong></p><p>${ tasksString}</p></td>`;
+              ++days;
+            }
+          }
+          tables += "</tr><br>";
+          ++currentRow;
+        }
+        $("#year-month").text(`締切カレンダー(${thisYear}年${thisMonth}月）`);
+        $("#calen-month").text(``);
+        $("#calendar").append(tables);
+      });
+
+      function getLastDay(){
+        let date = new Date();
+        date.setMonth(date.getMonth()+1);
+        date.setDate(0);
+        return date.getDate();
+      }
+    </script>
+>>>>>>> bf023cdcebe176a299151969f91c59929f1a173c
   </body>
 </html>

@@ -17,10 +17,23 @@ $(async function () {
   $("#todo-list").empty();
   console.log(data);
   $("#todo-list").append(getList(data));
+<<<<<<< HEAD
+=======
+});
+
+// Get today's tasks
+$("#today-tasks").click( async function(){
+  click=false;
+  const data = await httpGet("//" + window.location.host + "/api/today");
+  $("#todo-list").empty();
+  console.log(data);
+  $("#todo-list").append(getList(data));
+>>>>>>> bf023cdcebe176a299151969f91c59929f1a173c
 });
 
 // Get Task Detail
 $(document).on('click',".todo-detail", async function(){
+  click=false;
   let detail_id = $(this).data("detail_id");
   let data = await httpGet("//" + window.location.host + "/api/items/" + detail_id);
   $("#detail-name").text(`タスク名: ${data[0].task_name}`);
@@ -76,6 +89,7 @@ $(document).on('click',".todo-detail", async function(){
 
 // Create New Task
 $("#create-task").click( async function(){
+  click=false;
   if($("[name=task_name]").val()===''){
     alert("タスク名は入力必須です");
     return false;
@@ -84,7 +98,9 @@ $("#create-task").click( async function(){
 
   // 日付の値が、「○○○○年○月○日」の場合、ここで「○○○○-○-○」などに置き換え処理
   let deadline = $("[name=deadline]").val();
-  deadline = deadline.replace( /(\d+)年(\d+)月(\d+)日/g , "$1-$2-$3" );
+  deadline = deadline.replace( /(\d+)年(\d+)月(\d+)日/g , "$1-$2-$3" )
+  deadline += "  23:59:59";
+  console.log(deadline);
   // 期限の値に'-','/'が2個登場する場合は、とりあえずは有効な値としてキャッチする。
   // match() は一致する文字が0個の場合、nullを返すが、nullは扱いに困る。よって、空配列[]を入れて、それをカウントさせている。
   if((deadline.match( new RegExp( "-", "g" ))||[]).length===2 || (deadline.match( new RegExp( "/", "g"))||[]).length===2){
@@ -124,9 +140,39 @@ $("#create-task").click( async function(){
   window.location.reload();
 });
 
+// status change using toggleSwitch
+$(document).on("click",".status-toggle", function() {
+  const id = $(this).data("id");
+  const status = $(this).data("task_status");
+  let response;
+  let parentObj;
+  $(this).toggleClass("checked");
+  if(!$('input[name="check"]').prop("checked")) {
+    $(".status-toggle input").prop("checked", true);
+    response = httpUpdate("//" + window.location.host + `/api/status/${id}-${status}`);
+    console.log(response);
+    parentObj = $(this).parent().parent();
+    parentObj.find("i").removeClass("task-uncomplete");
+    parentObj.find("i").addClass("task-complete");
+    $(this).parent().next().next().data("task_status","1");
+    $(this).parent().addClass("stripe");
+    alert("Good job!");
+  } else {
+    $(".status-toggle input").prop("checked", false);
+    response = httpUpdate("//" + window.location.host + `/api/status/${id}-${status}`);
+    console.log(response);
+    parentObj = $(this).parent().parent();
+    parentObj.find("i").addClass("task-uncomplete");
+    parentObj.find("i").removeClass("task-complete");
+    $(this).parent().next().next().data("task_status","2");
+    $(this).parent().removeClass("stripe");
+    alert("Let's do task again!");
+  }
+});
 
 // Update
 $(document).on("click", ".todo-update", function(){
+  click=false;
   $("[name=update_id]").val($(this).data('task_id'));
   $("[name=update_name]").val($(this).data('task_name'));
   $("[name=update_deadline]").val($(this).data('deadline'));
@@ -189,6 +235,7 @@ $(document).on("click", ".todo-update", function(){
 
 // Delete Task
 $(document).on("click", ".todo-delete",function(){
+  click=false;
   let id = $(this).data('id');
   let taskName = $(this).data('task_name');
   $("#will_delete").text(taskName);
@@ -204,6 +251,7 @@ $(document).on("click", ".todo-delete",function(){
 
 // search task by keyword
 $("#search-icon").click( async function(){
+  click=false;
   $("[name=category_filter]").val(0);
   let keyword = $("[name=task-search]").val();
   const data = await httpGet(
@@ -211,6 +259,19 @@ $("#search-icon").click( async function(){
   );
   $("#todo-list").empty();
   console.log(data);
+<<<<<<< HEAD
+=======
+  let resultString;
+  if(data.length===0){
+    resultString = `キーワード「${keyword}」に一致するタスクはありませんでした。\n
+                    <button onclick="reloadPage()">戻る</button>`
+    $("#todo-list").append(resultString);
+  }else{
+    resultString = `キーワード「${keyword}」に一致する${data.length}のタスクが見つかりました。\n
+                    <button onclick="reloadPage()">戻る</button>`;
+    $("#todo-list").append(resultString);
+  }
+>>>>>>> bf023cdcebe176a299151969f91c59929f1a173c
   $("#todo-list").append(getList(data));
 });
 
@@ -219,7 +280,6 @@ $("[name=category_filter]").on("change", async function(){
   $("[name=task-search]").val('');
   const categoryId = $("[name=category_filter]").val();
   let data;
-  let filteredList;
   if(categoryId === '0'){
     data = await httpGet(
       "//" + window.location.host + "/api/items"
@@ -254,6 +314,10 @@ $("[name=sort-by]").on("change", async function(){
 
 // Hide completed task.
 $("#completed-hide").on("click",function(){
+<<<<<<< HEAD
+=======
+  click=false;
+>>>>>>> bf023cdcebe176a299151969f91c59929f1a173c
   if(!$(this).hasClass("active")){
     $(this).addClass("active");
     $(".completed_task").toggle("hide");
@@ -265,25 +329,52 @@ $("#completed-hide").on("click",function(){
   }
 });
 
+<<<<<<< HEAD
+=======
+// 日付のフォーマットに関する検証に利用
+>>>>>>> bf023cdcebe176a299151969f91c59929f1a173c
 function inputError(where,message){
   $(where).text(message).css("color", "red");
   console.log("Error output works!");
 }
 
+<<<<<<< HEAD
 
 function getList(data){
   const list =  data.map((item)=>{
     let dateString='';
     let timeOut = '';
     let deadlineAlert = '';
+=======
+// タスクリスト取得 一覧表示、サーチ、カテゴリー分類、ソートなどでしよう
+function getList(data){
+  let tasks = [];
+  let alertedTasks = [];
+  let unlimitedTasks = [];
+  data.map((item)=>{
+    let checkIcon = '';
+    let uncompleteIcon = `<i class='task-uncomplete bi bi-check-circle' data-id='${item.id}'></i>`;
+    let dateString='';
+    let timeOut = '';
+    let deadlineAlert = '';
+    let alertString = '';
+    let toggleChecked = '';
+>>>>>>> bf023cdcebe176a299151969f91c59929f1a173c
     if(item.deadline!==null){
       let deadline = new Date(item.deadline);
       let today = new Date();
       if(deadline < today){
         timeOut = 'time-out';
+<<<<<<< HEAD
         console.log(item.task_name+"is time out.");
       }else if((deadline.getTime()-today.getTime())/1000 < 86400){
         deadlineAlert = 'deadline-alert';
+=======
+        uncompleteIcon = '';
+      }else if((deadline.getTime()-today.getTime())/1000 < 86400){
+        deadlineAlert = 'deadline-alert';
+        alertString = '期限間近!!';
+>>>>>>> bf023cdcebe176a299151969f91c59929f1a173c
       }
       let year = deadline.getFullYear();
       let month = deadline.getMonth() +1;
@@ -292,22 +383,27 @@ function getList(data){
     }else {
       dateString = '期限設定なし';
     }
-    let checkIcon = '';
     let stripe = '';
     let backGray = '';
     let tag = '';
     let completed_task = '';
     if(item.task_status===1){
       checkIcon = "<i class='task-complete bi bi-check-circle'></i>";
+      uncompleteIcon = '';
       stripe = 'stripe';
       backGray = 'backGray';
       tag = 'grayTag';
+<<<<<<< HEAD
+=======
+      toggleChecked = 'checked';
+>>>>>>> bf023cdcebe176a299151969f91c59929f1a173c
       completed_task = 'completed_task';
     }else if(item.task_status===2){
       tag = 'blueTag';
     }else{
       tag = 'redTag';
     }
+<<<<<<< HEAD
     return `<li class="justify-content-md-center ${completed_task} ${timeOut} ${deadlineAlert}">
               ${checkIcon}
               <span class="${tag}"></span>
@@ -350,4 +446,149 @@ function getList(data){
             </li>`;
   });
   return list;
+=======
+
+    if(deadlineAlert!==''){
+      alertedTasks.push(
+        `<li class="justify-content-md-center ${completed_task} ${timeOut} ${deadlineAlert}">
+        ${checkIcon}${uncompleteIcon}
+        <span class="${tag}"></span>
+        <div class="list-content col col-9 ${backGray}">
+          <span class="todo-text ${stripe}">${item.task_name}</span>
+          <span class="alert-message">${timeOut}${alertString}</span>
+          <span class="created-date ${stripe}">${dateString}</span>
+          <div class="status-toggle ${toggleChecked}" data-id="${item.id}" data-task_status="${item.task_status}">
+            <input type="checkbox" name="check" />
+          </div>
+        </div>
+        <button
+          class="todo-detail btn btn-success col col-1"
+          data-detail_id="${item.id}"
+          data-target="#detailModal"
+          data-toggle="modal"
+        >
+          詳細
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary todo-update col col-1"
+          data-toggle="modal"
+          data-target="#exampleModal2"
+          data-task_id="${item.id}"
+          data-task_name="${item.task_name}"
+          data-deadline="${dateString}"
+          data-task_status="${item.task_status}"
+          data-cate_id="${item.category_id}"
+        >
+          更新
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger todo-delete col col-1"
+          data-toggle="modal"
+          data-target="#exampleModalCenter"
+          data-id="${item.id}"
+          data-task_name="${item.task_name}"
+        >
+          削除
+        </button>
+        </li>`
+      );
+    }else if(item.deadline===null){
+      unlimitedTasks.push(
+        `<li class="justify-content-md-center ${completed_task} ${timeOut} ${deadlineAlert}">
+        ${checkIcon}${uncompleteIcon}
+        <span class="${tag}"></span>
+        <div class="list-content col col-9 ${backGray}">
+          <span class="todo-text ${stripe}">${item.task_name}</span>
+          <span>${timeOut}</span>
+          <span class="created-date ${stripe}">${dateString}</span>
+          <div class="status-toggle ${toggleChecked}" data-id="${item.id}" data-task_status="${item.task_status}">
+            <input type="checkbox" name="check" />
+          </div>
+        </div>
+        <button
+          class="todo-detail btn btn-success col col-1"
+          data-detail_id="${item.id}"
+          data-target="#detailModal"
+          data-toggle="modal"
+        >
+          詳細
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary todo-update col col-1"
+          data-toggle="modal"
+          data-target="#exampleModal2"
+          data-task_id="${item.id}"
+          data-task_name="${item.task_name}"
+          data-deadline="${dateString}"
+          data-task_status="${item.task_status}"
+          data-cate_id="${item.category_id}"
+        >
+          更新
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger todo-delete col col-1"
+          data-toggle="modal"
+          data-target="#exampleModalCenter"
+          data-id="${item.id}"
+          data-task_name="${item.task_name}"
+        >
+          削除
+        </button>
+        </li>`
+      );
+    }else{
+      tasks.push(
+        `<li class="justify-content-md-center ${completed_task} ${timeOut} ${deadlineAlert}">
+        ${checkIcon}${uncompleteIcon}
+        <span class="${tag}"></span>
+        <div class="list-content col col-9 ${backGray}">
+          <span class="todo-text ${stripe}">${item.task_name}</span>
+          <span>${timeOut}</span>
+          <span class="created-date ${stripe}">${dateString}</span>
+          <div class="status-toggle ${toggleChecked}" data-id="${item.id}" data-task_status="${item.task_status}">
+            <input type="checkbox" name="check" />
+          </div>
+        </div>
+        <button
+          class="todo-detail btn btn-success col col-1"
+          data-detail_id="${item.id}"
+          data-target="#detailModal"
+          data-toggle="modal"
+        >
+          詳細
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary todo-update col col-1"
+          data-toggle="modal"
+          data-target="#exampleModal2"
+          data-task_id="${item.id}"
+          data-task_name="${item.task_name}"
+          data-deadline="${dateString}"
+          data-task_status="${item.task_status}"
+          data-cate_id="${item.category_id}"
+        >
+          更新
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger todo-delete col col-1"
+          data-toggle="modal"
+          data-target="#exampleModalCenter"
+          data-id="${item.id}"
+          data-task_name="${item.task_name}"
+        >
+          削除
+        </button>
+        </li>`
+      );
+    }
+    return;
+  });
+  return [...alertedTasks,...tasks,...unlimitedTasks].join('');
+>>>>>>> bf023cdcebe176a299151969f91c59929f1a173c
 }
