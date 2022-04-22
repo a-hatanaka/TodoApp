@@ -51,27 +51,39 @@ router.get("/calendar", async function(req,res,next){
 });
 
 // 新規タスク登録
-router.post("/tasks", function(req,res,next){
-  const createTask = create.createNewTask(req.body);
+router.post("/tasks", async function(req,res,next){
+  const createTask = await create.createNewTask(req.body);
   res.send(createTask);
 });
 
 
 // タスク削除
-router.delete("/tasks/:id", function(req, res, next){
-  const deleteTask = del.deleteTask(req.params.id);
+router.delete("/tasks/:id", async function(req, res, next){
+  const deleteTask = await del.deleteTask(req.params.id);
   res.send(deleteTask);
 });
 
+// status-completeのタスクを全て削除
+router.delete("/deleteAll/completed", async function(req,res,next){
+  const deleteCompleted = await del.deleteCompleted();
+  res.send(deleteCompleted);
+});
+
+// 期限切れのタスクを全て削除
+router.delete("/deleteAll/timeout", async function(req,res,next){
+  const timeoutTasks = await del.deleteTimeout();
+  res.send(timeoutTasks);
+});
+
 // タスク情報更新
-router.patch("/tasks/:id", function(req, res, next){
-  const updateTask = update.updateTask(req.params.id, req.body);
+router.patch("/tasks/:id", async function(req, res, next){
+  const updateTask = await update.updateTask(req.params.id, req.body);
   res.send(updateTask);
 });
 
 // タスク状態を「完了」にする
 router.patch("/status/:id", async function(req,res,next){
-  const statusComplete = update.updateStatus(req.params.id);
+  const statusComplete = await update.updateStatus(req.params.id);
   res.send(statusComplete);
 });
 

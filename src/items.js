@@ -81,6 +81,9 @@ sortTasks = async function(sortBy){
     // SQL記述
     let sql = '';
     switch (sortBy) {
+      case '0':
+        sql = 'SELECT * FROM t_task ORDER BY id';
+        break;
       case '1':
         sql = 'SELECT * FROM t_task ORDER BY deadline ASC';
         break;
@@ -88,7 +91,7 @@ sortTasks = async function(sortBy){
         sql = 'SELECT * FROM t_task ORDER BY deadline DESC';
         break;
       default:
-        sql = 'SELECT * FROM t_task ORDER BY id';
+        sql = 'SELECT * FROM t_task ORDER BY deadline ASC';
         break;
     }
     const [rows, fields] = await connection.query(sql);
@@ -146,6 +149,13 @@ getTodayTask = async function () {
   }
 };
 
+
+/**
+ * getMonthlyTasks
+ * カレンダー用にその月のタスクを取得
+ *
+ * @returns レスポンス JSON
+ */
 getMonthlyTasks = async function(){
   let connection = null;
   try {
@@ -153,24 +163,17 @@ getMonthlyTasks = async function(){
     let today = new Date();
     let thisYear = today.getFullYear();
     let thisMonth = today.getMonth()+1;
-    today.setHours(0);
-    today.setMinutes(0);
-    today.setSeconds(0);
-    let duplicatedToday = today;
 
-    // 月の初日を取得
-    today.setDate(1);
-    let firstDayOfMonth = today.getDate();
-    
+
     // 月の末日を取得
-    duplicatedToday.setMonth(duplicatedToday.getMonth()+1);
-    duplicatedToday.setDate(0);
-    let lastDayOfMonth = duplicatedToday.getDate();
+    today.setMonth(today.getMonth()+1);
+    today.setDate(0);
+    let lastDayOfMonth = today.getDate();
 
-    let minDate = `${thisYear}-${thisMonth}-${firstDayOfMonth}`;
+    let minDate = `${thisYear}-${thisMonth}-1`;
     let maxDate = `${thisYear}-${thisMonth}-${lastDayOfMonth}`;
     // SQL記述
-    const sql = "SELECT task_name, CAST(deadline AS DATE) AS deadline, task_status,category_id FROM t_task WHERE deadline >= ? AND deadline < ? ORDER BY deadline";
+    const sql = "SELECT id, task_name, CAST(deadline AS DATE) AS deadline, task_status,category_id FROM t_task WHERE deadline >= ? AND deadline < ? ORDER BY deadline";
     let data = [minDate,maxDate];
     const [rows, fields] = await connection.query(sql,data);
     return rows;
