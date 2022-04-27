@@ -298,6 +298,7 @@ table, td, th {
   position: fixed;
   top: -150px;
   right: 30%;
+  border-radius: 70%;
 }
 
 #dangerous-actions {
@@ -317,4 +318,8 @@ table, td, th {
   border: 1px gray solid;
   border-bottom-left-radius: 98%;
   border-bottom-right-radius: 98%;
+}
+
+.trash-icon {
+  cursor: grabbing;
 }

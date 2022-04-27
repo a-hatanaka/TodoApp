@@ -41,13 +41,15 @@
     <!-- Dangerous Actions  -->
     <div id="top-hidden">
       <div id="dangerous-actions">
-        <button class="btn btn-danger" id="delete-compTask">完了済みの全タスクを削除</button><br>
-        <button class="btn btn-danger" id="delete-timeoutTask">期限経過済みの全タスクを削除</button>
+        <button class="btn btn-danger" id="delete-compTask">
+          完了済みの全タスクを削除</button
+        ><br />
+        <button class="btn btn-danger" id="delete-timeoutTask">
+          期限経過済みの全タスクを削除
+        </button>
       </div>
       <i class="bi bi-exclamation-triangle" id="show-icon"></i>
     </div>
-
-
 
     <div class="return-home" onclick="reloadPage()">一覧</div>
     <div id="today-tasks">今日が期限のタスク</div>
@@ -67,9 +69,9 @@
         <div id="sort-tasks">
           <select name="sort-by">
             <option value="0">追加順</option>
-            <option value="1">期限昇順</option>
-            <option value="2">期限降順</option>
-            <option value="3" selected>デフォルト</option>
+            <option value="1" selected>期限近い順</option>
+            <!-- <option value="2">期限遠い順</option> -->
+            <!-- <option value="3">デフォルト</option> -->
           </select>
         </div>
 
@@ -88,7 +90,7 @@
           <i class="bi bi-search" id="search-icon"></i>
         </div>
         <br /><br />
-        <button id="completed-hide">完了タスクをカスク</button>
+        <button id="completed-hide">完了タスクを隠す</button>
         <ul id="todo-list">
           <!-- APIで取得したdataを処理したものが入る(appendされる) -->
         </ul>
@@ -130,7 +132,7 @@
                   type="text"
                   class="form-control back-gray datepicker"
                   id="exampleFormControlInput2"
-                  placeholder="2022/06/31もしくは2022-06-31の形式でお願いします"
+                  placeholder="1つの日付を認識できるように記入してください。"
                 />
               </div>
               <div class="form-group">
@@ -365,7 +367,7 @@
       </div>
     </div>
 
-    <!-- カレンダーからタスク追加 -->
+    <!-- Create task by calendar  -->
     <div
       class="modal fade"
       id="create-by-calendar"
@@ -393,7 +395,10 @@
               </div>
               <div class="form-group">
                 <label for="exampleFormControlInput1">期限</label
-                ><span id="create-error-by-calendar" class="error-message"></span>
+                ><span
+                  id="create-error-by-calendar"
+                  class="error-message"
+                ></span>
                 <input
                   readonly
                   name="create-deadline-by-calendar"
@@ -426,7 +431,11 @@
             >
               キャンセル
             </button>
-            <button id="create-task-by-calendar" type="button" class="btn btn-primary">
+            <button
+              id="create-task-by-calendar"
+              type="button"
+              class="btn btn-primary"
+            >
               登録
             </button>
           </div>
@@ -434,7 +443,7 @@
       </div>
     </div>
 
-    <!-- UpdateTodo Modal -->
+    <!-- UpdateTodo by calendar Modal -->
     <div
       class="modal fade"
       id="update-by-calendar"
@@ -468,7 +477,10 @@
               </div>
               <div class="form-group">
                 <label for="exampleForm2ControlInput2">期限</label
-                ><span id="update-error-by-calendar" class="error-message"></span>
+                ><span
+                  id="update-error-by-calendar"
+                  class="error-message"
+                ></span>
                 <input
                   type="text"
                   class="form-control back-gray datepicker"
@@ -506,6 +518,11 @@
             </form>
           </div>
           <div class="modal-footer">
+            <i
+              class="bi bi-trash trash-icon"
+              id="delete-by-calendar"
+              data-id=""
+            ></i>
             <button
               type="button"
               class="btn btn-secondary back-gray"
@@ -513,9 +530,31 @@
             >
               キャンセル
             </button>
-            <button id="update-complete-by-calendar" type="button" class="btn btn-primary">
+            <button
+              id="update-complete-by-calendar"
+              type="button"
+              class="btn btn-primary"
+            >
               更新
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message modal -->
+    <div
+      class="modal fade"
+      id="message-modal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <p id="message"></p>
           </div>
         </div>
       </div>
@@ -546,95 +585,25 @@
       function reloadPage() {
         location.reload();
       }
-
-      $(document).on("click",".calendar-update", async function(){
-        let id = $(this).data("id");
-        let task = await httpGet(
-          "//" + window.location.host + `/api/items/${id}`
-        );
-        task = task[0];
-        let year,month,date;
-        [year,month,date] = task.deadline.split("-");
-        date = date.substr(0,2);
-        console.log(date);
-        $("[name=update-id-by-calendar]").val(task.id);
-        $("[name=update-name-by-calendar]").val(task.task_name);
-        $("[name=update-deadline-by-calendar]").val(`${year}年${month}月${date}日`);
-        $("[name=update-cate-by-calendar]").val(task.category_id);
-        $("[name=update-status-by-calendar]").val(task.task_status);
-
-        $("#update-complete-by-calendar").click(async function () {
-        let id = $("[name=update-id-by-calendar]").val();
-        let name = $("[name=update-name-by-calendar]").val();
-        if (name === "") {
-          alert("タスク名は空にできません。");
-          $("#exampleModal2").modal("hide");
-          return false;
-        }
-        let deadline = $("[name=update-deadline-by-calendar]").val();
-        deadline = deadline.replace(/(\d+)年(\d+)月(\d+)日/g, "$1-$2-$3");
-        let month = Number(deadline.split('-')[1]);
-        if(deadline !== ''){
-            deadline += "  23:59:59";
-        }
-        // 期限の値に'-','/'が2個登場する場合は、とりあえずは有効な値としてキャッチする。
-        // match() は一致する文字が0個の場合、nullを返すが、nullは扱いに困る。よって、空配列[]を入れて、それをカウントさせている。
-        if (
-          (deadline.match(new RegExp("-", "g")) || []).length === 2 ||
-          (deadline.match(new RegExp("/", "g")) || []).length === 2
-        ) {
-          console.log("It includes 2 '-' or '/'");
-          let targetDate = new Date(deadline);
-          let now = new Date();
-          if (targetDate < now) {
-            alert("今日以降の日付を指定してください。");
-            inputError("#update-error-by-calendar", "今日以降の日付を指定してください。");
-            return false;
-          }else if (Number.isNaN(targetDate.getDate())) {
-            alert("Its invalid date");
-            inputError(
-              "#update-error-by-calendar",
-              "日付が正しいフォーマットで入力されていません。"
-            );
-            return false;
-          } else if(targetDate.getFullYear()===1970 || targetDate.getMonth()+1 !== month){
-            inputError(
-              "#update-error-by-calendar",
-              "存在しない日付のようです。"
-            );
-            return false;
-          }
-        } else if (deadline === "" || deadline === "期限設定なし") {
-          deadline = null;
-          console.log("ここまできた");
-          return false;
-        }else{
-          alert("Its invalid date");
-          inputError(
-            "#update-error-by-calendar",
-            "日付が正しいフォーマットで入力されていません。"
+      $("#delete-by-calendar").click(async function () {
+        const id = $("#delete-by-calendar").data("id");
+        let confirmation = window.confirm("本当に消去しますか？");
+        if (confirmation === true) {
+          const response = await httpDelete(
+            "//" + window.location.host + `/api/tasks/${id}`
           );
+          console.log("deleted.");
+          alert("消去しました。");
+        } else {
           return false;
         }
-        let cate_id = $("[name=update-cate-by-calendar]").val();
-        let status = $("[name=update-status-by-calendar]").val();
-        const data = {
-          task_name: name,
-          category_id: cate_id,
-          deadline: deadline,
-          task_status: status,
-        };
-        
-        const response = await httpUpdate(
-          "//" + window.location.host + "/api/tasks/" + id,
-          data
-        );
-        alert("更新完了しました。");
-        console.log(response);
-        window.location.reload();
       });
+      $(function () {
+        $("#message-modal").modal();
+
+        // $("#message-modal").modal("show");
+        $("#message").text("modal opened");
       });
-      
     </script>
   </body>
 </html>

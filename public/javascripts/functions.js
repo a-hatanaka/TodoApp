@@ -15,7 +15,7 @@ $(function () {
 
 // タスク一覧取得API
 $(async function () {
-  $("")
+  $("");
   const data = await httpGet("//" + window.location.host + "/api/items");
   $("#todo-list").empty();
   console.log(data);
@@ -101,9 +101,10 @@ $("#create-task").click(async function () {
   // 日付の値が、「○○○○年○月○日」の場合、ここで「○○○○-○-○」などに置き換え処理
   let deadline = $("[name=deadline]").val();
   deadline = deadline.replace(/(\d+)年(\d+)月(\d+)日/g, "$1-$2-$3");
-  let month = Number(deadline.split('-')[1]);
-  if(deadline !== ''){
-      deadline += "  23:59:59";
+  deadline = deadline.replace(/(\d+)\/(\d+)\/(\d+)/g, "$1-$2-$3");
+  let month = Number(deadline.split("-")[1]);
+  if (deadline !== "") {
+    deadline += "  23:59:59";
   }
   console.log(deadline);
   // 期限の値に'-','/'が2個登場する場合は、とりあえずは有効な値としてキャッチする。
@@ -119,23 +120,20 @@ $("#create-task").click(async function () {
       alert("今日以降の日付を指定してください。");
       inputError("#create-error", "今日以降の日付を指定してください。");
       return false;
-    }else if (Number.isNaN(targetDate.getDate())) {
+    } else if (Number.isNaN(targetDate.getDate())) {
       alert("Its invalid date");
       inputError(
         "#create-error",
         "日付が正しいフォーマットで入力されていません。"
       );
       return false;
-    } else if(targetDate.getFullYear()===1970 || targetDate.getMonth()+1 !== month){
-      inputError(
-        "#update-error-by-calendar",
-        "存在しない日付のようです。"
-      );
+    } else if (targetDate.getFullYear() === 1970) {
+      inputError("#create-error", "存在しない日付のようです。");
       return false;
     }
   } else if (deadline === "" || deadline === "期限設定なし") {
     deadline = null;
-  }else{
+  } else {
     alert("Its invalid date");
     inputError(
       "#create-error",
@@ -159,13 +157,14 @@ $("#create-task").click(async function () {
 });
 
 // カレンダーからタスク追加
-$(document).on("click",".calendar-plus",async function(){
+$(document).on("click", ".calendar-plus", async function () {
   let year = $(this).data("year");
   let month = $(this).data("month");
   let date = $(this).data("date");
   $("#create-deadline-by-calendar").val(`${year}年${month}月${date}日`);
   return;
 });
+// カレンダーからの追加を完了させる。
 $("#create-task-by-calendar").click(async function () {
   if ($("[name=create-name-by-calendar]").val() === "") {
     alert("タスク名は入力必須です");
@@ -176,11 +175,12 @@ $("#create-task-by-calendar").click(async function () {
   // 日付の値が、「○○○○年○月○日」の場合、ここで「○○○○-○-○」などに置き換え処理
   let deadline = $("[name=create-deadline-by-calendar]").val();
   deadline = deadline.replace(/(\d+)年(\d+)月(\d+)日/g, "$1-$2-$3");
-  let month = Number(deadline.split('-')[1]);
+  deadline = deadline.replace(/(\d+)\/(\d+)\/(\d+)/g, "$1-$2-$3");
+  let month = Number(deadline.split("-")[1]);
   console.log(month);
   console.log(deadline);
-  if(deadline !== ''){
-      deadline += "  23:59:59";
+  if (deadline !== "") {
+    deadline += "  23:59:59";
   }
   console.log(deadline);
   // 期限の値に'-','/'が2個登場する場合は、とりあえずは有効な値としてキャッチする。
@@ -194,27 +194,30 @@ $("#create-task-by-calendar").click(async function () {
     let now = new Date();
     if (targetDate < now) {
       alert("今日以降の日付を指定してください。");
-      inputError("#create-error-by-calendar", "今日以降の日付を指定してください。");
+      inputError(
+        "#create-error-by-calendar",
+        "今日以降の日付を指定してください。"
+      );
       return false;
-    }else if (Number.isNaN(targetDate.getDate())) {
+    } else if (Number.isNaN(targetDate.getDate())) {
       alert("Its invalid date");
       inputError(
         "#create-error-by-calendar",
         "日付が正しいフォーマットで入力されていません。"
       );
       return false;
-    } else if(targetDate.getFullYear()===1970 || targetDate.getMonth()+1 !== month){
+    } else if (
+      targetDate.getFullYear() === 1970 ||
+      targetDate.getMonth() + 1 !== month
+    ) {
       console.log(deadline);
       console.log(month);
-      inputError(
-        "#create-error-by-calendar",
-        "存在しない日付のようです。"
-      );
+      inputError("#create-error-by-calendar", "存在しない日付のようです。");
       return false;
     }
   } else if (deadline === "" || deadline === "期限設定なし") {
     deadline = null;
-  }else{
+  } else {
     alert("Its invalid date");
     inputError(
       "#create-error-by-calendar",
@@ -229,7 +232,6 @@ $("#create-task-by-calendar").click(async function () {
     category_id: cate_id,
   };
   console.log(data);
-  return;
   const response = await httpPost(
     "//" + window.location.host + "/api/tasks",
     data
@@ -239,6 +241,91 @@ $("#create-task-by-calendar").click(async function () {
   window.location.reload();
 });
 
+// カレンダーからupdate
+$(document).on("click", ".calendar-update", async function () {
+  let id = $(this).data("id");
+  let task = await httpGet("//" + window.location.host + `/api/items/${id}`);
+  task = task[0];
+  let year, month, date;
+  [year, month, date] = task.deadline.split("-");
+  date = date.substr(0, 2);
+  console.log(date);
+  $("[name=update-id-by-calendar]").val(task.id);
+  $("[name=update-name-by-calendar]").val(task.task_name);
+  $("[name=update-deadline-by-calendar]").val(`${year}年${month}月${date}日`);
+  $("[name=update-cate-by-calendar]").val(task.category_id);
+  $("[name=update-status-by-calendar]").val(task.task_status);
+  $("#delete-by-calendar").data("id", id);
+});
+// カレンダーからのupdateを完了させる。
+$("#update-complete-by-calendar").click(async function () {
+  let id = $("[name=update-id-by-calendar]").val();
+  let name = $("[name=update-name-by-calendar]").val();
+  if (name === "") {
+    alert("タスク名は空にできません。");
+    $("#exampleModal2").modal("hide");
+    return false;
+  }
+  let deadline = $("[name=update-deadline-by-calendar]").val();
+  deadline = deadline.replace(/(\d+)年(\d+)月(\d+)日/g, "$1-$2-$3");
+  deadline = deadline.replace(/(\d+)\/(\d+)\/(\d+)/g, "$1-$2-$3");
+  let month = Number(deadline.split("-")[1]);
+  if (deadline !== "") {
+    deadline += "  23:59:59";
+  }
+  // 期限の値に'-','/'が2個登場する場合は、とりあえずは有効な値としてキャッチする。
+  // match() は一致する文字が0個の場合、nullを返すが、nullは扱いに困る。よって、空配列[]を入れて、それをカウントさせている。
+  if (
+    (deadline.match(new RegExp("-", "g")) || []).length === 2 ||
+    (deadline.match(new RegExp("/", "g")) || []).length === 2
+  ) {
+    console.log("It includes 2 '-' or '/'");
+    let targetDate = new Date(deadline);
+    let now = new Date();
+
+    if (Number.isNaN(targetDate.getDate())) {
+      alert("Its invalid date");
+      inputError(
+        "#update-error-by-calendar",
+        "日付が正しいフォーマットで入力されていません。"
+      );
+      return false;
+    } else if (
+      targetDate.getFullYear() === 1970 ||
+      targetDate.getMonth() + 1 !== month
+    ) {
+      inputError("#update-error-by-calendar", "存在しない日付のようです。");
+      return false;
+    }
+  } else if (deadline === "" || deadline === "期限設定なし") {
+    deadline = null;
+    console.log("ここまできた");
+    return false;
+  } else {
+    alert("Its invalid date");
+    inputError(
+      "#update-error-by-calendar",
+      "日付が正しいフォーマットで入力されていません。"
+    );
+    return false;
+  }
+  let cate_id = $("[name=update-cate-by-calendar]").val();
+  let status = $("[name=update-status-by-calendar]").val();
+  const data = {
+    task_name: name,
+    category_id: cate_id,
+    deadline: deadline,
+    task_status: status,
+  };
+
+  const response = await httpUpdate(
+    "//" + window.location.host + "/api/tasks/" + id,
+    data
+  );
+  alert("更新完了しました。");
+  console.log(response);
+  window.location.reload();
+});
 
 // status change using toggleSwitch
 $(document).on("click", ".status-toggle", async function () {
@@ -246,9 +333,9 @@ $(document).on("click", ".status-toggle", async function () {
   const id = $(this).data("id");
   const status = $(this).data("task_status");
   let response;
-  let parentObj = $(this).parent().parent();;
+  let parentObj = $(this).parent().parent();
 
-  if(doing===false){
+  if (doing === false) {
     doing = true;
     // checkedクラスがないとき = 元のstatusが2か3の時
     if (!$(this).hasClass("checked")) {
@@ -257,7 +344,7 @@ $(document).on("click", ".status-toggle", async function () {
       $(this).parent().addClass("stripe");
       parentObj.find("i").removeClass("task-uncomplete");
       parentObj.find("i").addClass("task-complete");
-      $(this).data("task-status","1");
+      $(this).data("task-status", "1");
       // ${id}- の後ろの数字は、現在のステータスを示す
       response = await httpUpdate(
         "//" + window.location.host + `/api/status/${id}-2`
@@ -266,12 +353,12 @@ $(document).on("click", ".status-toggle", async function () {
       alert("Good job!");
     } else {
       //checkedクラスがあるとき = 元のstatusが1の時
-      console.log('to uncomp');
+      console.log("to uncomp");
       $(this).removeClass("checked");
       $(this).parent().removeClass("stripe");
       parentObj.find("i").addClass("task-uncomplete");
       parentObj.find("i").removeClass("task-complete");
-      $(this).data("task-status","2");
+      $(this).data("task-status", "2");
       response = await httpUpdate(
         "//" + window.location.host + `/api/status/${id}-1`
       );
@@ -288,87 +375,87 @@ $(document).on("click", ".todo-update", function () {
   $("[name=update_id]").val($(this).data("task_id"));
   $("[name=update_name]").val($(this).data("task_name"));
   $("[name=update_deadline]").val($(this).data("deadline"));
-  $("[name=update_cate]").val($(this).data("cate_id") ? $(this).data("cate_id"):'0');
+  $("[name=update_cate]").val(
+    $(this).data("cate_id") ? $(this).data("cate_id") : "0"
+  );
   $("[name=update_status]").val($(this).data("task_status"));
   $("[name=update_id]").val($(this).data("task_id"));
-  $("#update-complete").click(async function () {
-    let id = $("[name=update_id]").val();
-    let name = $("[name=update_name]").val();
-    if (name === "") {
-      alert("タスク名は空にできません。");
-      $("#exampleModal2").modal("hide");
-      return false;
-    }
-    let deadline = $("[name=update_deadline]").val();
-    deadline = deadline.replace(/(\d+)年(\d+)月(\d+)日/g, "$1-$2-$3");
-    let month = Number(deadline.split('-')[1]);
-    console.log(deadline.split('-')[1]);
-    console.log(deadline.split('-'));
-    if(deadline !== ''){
-        deadline += "  23:59:59";
-    }
-    // 期限の値に'-','/'が2個登場する場合は、とりあえずは有効な値としてキャッチする。
-    // match() は一致する文字が0個の場合、nullを返すが、nullは扱いに困る。よって、空配列[]を入れて、それをカウントさせている。
-    if (
-      (deadline.match(new RegExp("-", "g")) || []).length === 2 ||
-      (deadline.match(new RegExp("/", "g")) || []).length === 2
-    ) {
-      console.log("It includes 2 '-' or '/'");
-      let targetDate = new Date(deadline);
-      let now = new Date();
-      if (targetDate < now) {
-        alert("今日以降の日付を指定してください。");
-        inputError("#update-error", "今日以降の日付を指定してください。");
-        return false;
-      }else if (Number.isNaN(targetDate.getDate())) {
-        alert("Its invalid date");
-        inputError(
-          "#update-error",
-          "日付が正しいフォーマットで入力されていません。"
-        );
-        return false;
-      } else if(targetDate.getFullYear()===1970 || targetDate.getMonth()+1 !== month){
-        inputError(
-          "#update-error",
-          "存在しない日付のようです。"
-        );
-        return false;
-      }
-      console.log(targetDate);
-      console.log(targetDate.getFullYear());
-    } else if (deadline === "" || deadline === "期限設定なし") {
-      deadline = null;
-      console.log("ここまできた");
-      return false;
-    }else{
+});
+
+// update complete
+$("#update-complete").click(async function () {
+  let id = $("[name=update_id]").val();
+  let name = $("[name=update_name]").val();
+  if (name === "") {
+    alert("タスク名は空にできません。");
+    $("#exampleModal2").modal("hide");
+    return false;
+  }
+  let deadline = $("[name=update_deadline]").val();
+  deadline = deadline.replace(/(\d+)年(\d+)月(\d+)日/g, "$1-$2-$3");
+  deadline = deadline.replace(/(\d+)\/(\d+)\/(\d+)/g, "$1-$2-$3");
+  let month = Number(deadline.split("-")[1]);
+  if (deadline !== "") {
+    deadline += "  23:59:59";
+  }
+  // 期限の値に'-','/'が2個登場する場合は、とりあえずは有効な値としてキャッチする。
+  // match() は一致する文字が0個の場合、nullを返すが、nullは扱いに困る。よって、空配列[]を入れて、それをカウントさせている。
+  if (
+    (deadline.match(new RegExp("-", "g")) || []).length === 2 ||
+    (deadline.match(new RegExp("/", "g")) || []).length === 2
+  ) {
+    console.log("It includes 2 '-' or '/'");
+    let targetDate = new Date(deadline);
+    if (Number.isNaN(targetDate.getDate())) {
       alert("Its invalid date");
       inputError(
         "#update-error",
         "日付が正しいフォーマットで入力されていません。"
       );
       return false;
+    } else if (
+      targetDate.getFullYear() === 1970 ||
+      targetDate.getMonth() + 1 !== month
+    ) {
+      console.log(targetDate.getMonth() + 1);
+      console.log(month);
+      inputError("#update-error", "存在しない日付のようです。");
+      return false;
     }
-
-    // To hide updateModal, use this code.
-    // $("#exampleModal2").modal("hide");
-
-    let cate_id = $("[name=update_cate]").val();
-    let status = $("[name=update_status]").val();
-    const data = {
-      task_name: name,
-      category_id: cate_id,
-      deadline: deadline,
-      task_status: status,
-    };
-    console.log(data);
-    const response = await httpUpdate(
-      "//" + window.location.host + "/api/tasks/" + id,
-      data
+    console.log(targetDate);
+    console.log(targetDate.getFullYear());
+  } else if (deadline === "" || deadline === "期限設定なし") {
+    deadline = null;
+    console.log("ここまできた");
+    return false;
+  } else {
+    alert("Its invalid date");
+    inputError(
+      "#update-error",
+      "日付が正しいフォーマットで入力されていません。"
     );
-    alert("更新完了しました。");
-    console.log(response);
-    window.location.reload();
-  });
+    return false;
+  }
+
+  // To hide updateModal, use this code.
+  // $("#exampleModal2").modal("hide");
+
+  let cate_id = $("[name=update_cate]").val();
+  let status = $("[name=update_status]").val();
+  const data = {
+    task_name: name,
+    category_id: cate_id,
+    deadline: deadline,
+    task_status: status,
+  };
+  console.log(data);
+  const response = await httpUpdate(
+    "//" + window.location.host + "/api/tasks/" + id,
+    data
+  );
+  alert("更新完了しました。");
+  console.log(response);
+  window.location.reload();
 });
 
 // Delete Task
@@ -376,27 +463,28 @@ $(document).on("click", ".todo-delete", function () {
   let id = $(this).data("id");
   let taskName = $(this).data("task_name");
   $("#will_delete").text(taskName);
-  $("#delete-complete").click(async function () {
-    const response = await httpDelete(
-      "//" + window.location.host + "/api/tasks/" + id
-    );
-    console.log(response);
-    alert("Delete Complete!");
-    window.location.reload();
-  });
+});
+// Deleteを完了させる。
+$("#delete-complete").click(async function () {
+  const response = await httpDelete(
+    "//" + window.location.host + "/api/tasks/" + id
+  );
+  console.log(response);
+  alert("Delete Complete!");
+  window.location.reload();
 });
 
 // Delete all time-out-tasks
 $(document).on("click", "#delete-timeoutTask", async function () {
   let confirmation = window.confirm("本当に消すんですね？");
-  if(confirmation){
+  if (confirmation) {
     const response = await httpDelete(
       "//" + window.location.host + "/api/deleteAll/timeout"
     );
     console.log(response);
     alert("Delete Complete!");
     window.location.reload();
-  }else{
+  } else {
     return false;
   }
 });
@@ -404,18 +492,17 @@ $(document).on("click", "#delete-timeoutTask", async function () {
 // Delete all completed-tasks
 $(document).on("click", "#delete-compTask", async function () {
   let confirmation = window.confirm("本当に消すんですね？");
-  if(confirmation){
+  if (confirmation) {
     const response = await httpDelete(
-    "//" + window.location.host + "/api/deleteAll/completed"
-  );
-  console.log(response);
-  alert("Delete Complete!");
-  window.location.reload();
-  }else{
+      "//" + window.location.host + "/api/deleteAll/completed"
+    );
+    console.log(response);
+    alert("Delete Complete!");
+    window.location.reload();
+  } else {
     return false;
   }
 });
-
 
 // search task by keyword
 $("#search-icon").click(async function () {
@@ -433,7 +520,7 @@ $("#search-icon").click(async function () {
                     <button onclick="reloadPage()">戻る</button>`;
     $("#todo-list").append(resultString);
   } else {
-    resultString = `キーワード「${keyword}」に一致する${data.length}のタスクが見つかりました。\n
+    resultString = `キーワード「${keyword}」に一致する${data.length}件のタスクが見つかりました。\n
                     <button onclick="reloadPage()">戻る</button>`;
     $("#todo-list").append(resultString);
   }
@@ -471,9 +558,9 @@ $("[name=sort-by]").on("change", async function () {
   );
   $("#todo-list").empty();
   console.log(data);
-  if(sortBy==0){
+  if (sortBy == 0) {
     $("#todo-list").append(getSimpleList(data));
-  }else{
+  } else {
     $("#todo-list").append(getList(data));
   }
 });
@@ -484,36 +571,38 @@ $("#completed-hide").on("click", function () {
   if (!$(this).hasClass("active")) {
     $(this).addClass("active");
     $(".completed_task").toggle("hide");
-    $(this).text("モドス");
+    $(this).text("戻す").css("width", "130px");
   } else {
     $(this).removeClass("active");
     $(".completed_task").toggle("hide");
-    $(this).text("完了タスクをカスク");
+    $(this).text("完了タスクを隠す");
   }
 });
 
 // データの大量削除を伴う危険な処理
-$("#show-icon").click(function(){
-  if($(this).hasClass("showing")){
+$("#show-icon").click(function () {
+  if ($(this).hasClass("showing")) {
     $(this).removeClass("showing bi-x-circle");
     $(this).addClass("bi-exclamation-triangle");
-    $(this).css("top","0px");
-    $("#top-hidden").css("top","-150px")
-  }else{
+    $(this).css("top", "0px");
+    $("#top-hidden").css("top", "-150px");
+    $("#top-hidden").css("z-index", "0");
+  } else {
     $(this).removeClass("bi-exclamation-triangle");
     $(this).addClass("showing bi-x-circle");
-    $(this).css("top","150px");
-    $("#top-hidden").css("top","0px")
+    $(this).css("top", "150px");
+    $("#top-hidden").css("top", "0px");
+    $("#top-hidden").css("z-index", "1000");
   }
 });
-$(document).click(function(event){
-  if($("#show-icon").hasClass("showing")){
-    if(!$(event.target).closest("#top-hidden").length){
+$(document).click(function (event) {
+  if ($("#show-icon").hasClass("showing")) {
+    if (!$(event.target).closest("#top-hidden").length) {
       $("#show-icon").removeClass("showing bi-x-circle");
       $("#show-icon").addClass("bi-exclamation-triangle");
-      $("#show-icon").css("top","0px");
-      $("#top-hidden").css("top","-150px");
-      $("#top-hidden").css("z-index","1000");
+      $("#show-icon").css("top", "0px");
+      $("#top-hidden").css("top", "-150px");
+      $("#top-hidden").css("z-index", "1000");
     }
   }
 });
@@ -524,7 +613,7 @@ function inputError(where, message) {
   console.log("Error output works!");
 }
 
-// タスクリスト取得 一覧表示、サーチ、カテゴリー分類、ソートなどでしよう
+// タスクリスト取得 一覧表示、サーチ、カテゴリー分類、ソートなどで使用
 function getList(data) {
   let tasks = [];
   let alertedTasks = [];
@@ -717,8 +806,8 @@ function getList(data) {
 }
 
 // 追加順にソートする場合に使用
-function getSimpleList(data){
-  let listString = '';
+function getSimpleList(data) {
+  let listString = "";
   data.map((item) => {
     let checkIcon = "";
     let uncompleteIcon = `<i class='task-uncomplete bi bi-check-circle' data-id='${item.id}'></i>`;
@@ -808,15 +897,15 @@ function getSimpleList(data){
   return listString;
 }
 
-
-
-
 // get calendar
 $("#open-calendar").click(async function () {
-  $("#calendar").empty();
+  if ($("#calendar tr").length > 1) {
+    $("#calendar").empty();
+  }
   let today = new Date();
   let thisYear = today.getFullYear();
   let thisMonth = today.getMonth() + 1;
+  today.setDate(1);
   let thisDate = today.getDate();
   let weekOfFirst = today.getDay();
   let lastDayOfMonth = getLastDay();
@@ -854,10 +943,10 @@ $("#open-calendar").click(async function () {
     // 日付のみ取得したいが、deadlineのバリューは、2022-04-19 11:21:11などの
     // 不要な要素が多い。よって、splitで"-"で区切り配列に、その[2]の要素を文文字列分割で、２文字だけ取り出したのが、日付。
     date = Number(item.deadline.split("-")[2].substr(0, 2));
-    if(date > lastDayOfMonth){
+    if (date > lastDayOfMonth) {
       date = 1;
-    }else{
-      date = date+1;
+    } else {
+      date = date + 1;
     }
     if (taskArray[date] === undefined) {
       taskArray[date] = [];
@@ -867,21 +956,22 @@ $("#open-calendar").click(async function () {
   let current = 1;
   let tables = "";
   let days = 1;
-  let tasksString = '';
+  let tasksString = "";
   let task_status;
   let stripe;
-  for (let i = 1; i <= 5; i++) {
+  let maxCurrent = (lastDayOfMonth + skipWeek) / 7;
+  for (let i = 1; i <= maxCurrent; i++) {
     tables += "<tr>";
     for (let j = 1; j <= 7; j++) {
       tasksString = "";
-      if (current === 1 && j < skipWeek) {
+      if (current === 1 && j <= skipWeek) {
         tables += "<td class='backGray'> </td>";
       } else if (days > lastDayOfMonth) {
         tables += "<td class='backGray'> </td>";
       } else {
         if (taskArray[days] !== undefined) {
           taskArray[days].forEach((task) => {
-            stripe = '';
+            stripe = "";
             if (task.task_status === 1) {
               task_status = "完了";
               stripe = "stripe";
@@ -893,12 +983,11 @@ $("#open-calendar").click(async function () {
             tasksString += `<a class="calendar-update ${stripe}" data-target="#update-by-calendar" data-toggle="modal" data-id="${task.id}">・${task.task_name}(${task_status})</a><br>`;
           });
         }
-        if(days >= thisDate){
+        if (days >= thisDate) {
           tables += `<td><p><strong>${days}</strong></p><p>${tasksString}</p><i class="bi bi-calendar-plus calendar-plus" data-toggle="modal" data-target="#create-by-calendar" data-date="${days}" data-month="${thisMonth}" data-year="${thisYear}"></i></td>`;
-        }else{
+        } else {
           tables += `<td><p><strong>${days}</strong></p><p>${tasksString}</p></td>`;
         }
-        
         ++days;
       }
     }
@@ -906,7 +995,6 @@ $("#open-calendar").click(async function () {
     ++current;
     console.log(taskArray);
   }
-  console.log(555);
   $("#year-month").text(`締切カレンダー(${thisYear}年${thisMonth}月）`);
   $("#calendar").append(tables);
 });
