@@ -53,6 +53,7 @@
 
     <div class="return-home" onclick="reloadPage()">一覧</div>
     <div id="today-tasks">今日が期限のタスク</div>
+
     <div class="container">
       <!-- Content here -->
       <div id="main-contents">
@@ -90,7 +91,9 @@
           <i class="bi bi-search" id="search-icon"></i>
         </div>
         <br /><br />
+
         <button id="completed-hide">完了タスクを隠す</button>
+
         <ul id="todo-list">
           <!-- APIで取得したdataを処理したものが入る(appendされる) -->
         </ul>
@@ -585,25 +588,6 @@
       function reloadPage() {
         location.reload();
       }
-      $("#delete-by-calendar").click(async function () {
-        const id = $("#delete-by-calendar").data("id");
-        let confirmation = window.confirm("本当に消去しますか？");
-        if (confirmation === true) {
-          const response = await httpDelete(
-            "//" + window.location.host + `/api/tasks/${id}`
-          );
-          console.log("deleted.");
-          alert("消去しました。");
-        } else {
-          return false;
-        }
-      });
-      $(function () {
-        $("#message-modal").modal();
-
-        // $("#message-modal").modal("show");
-        $("#message").text("modal opened");
-      });
     </script>
   </body>
 </html>

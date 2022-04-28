@@ -12,7 +12,9 @@ getListItem = async function () {
   try {
     connection = await mysql.createConnection(config.dbSetting);
     // SQL記述
-    const sql = "SELECT * FROM t_task LEFT JOIN m_category ON t_task.category_id = m_category.category_id";
+    const sql =
+      // "SELECT * FROM t_task LEFT JOIN m_category ON t_task.category_id = m_category.category_id";
+      "SELECT * FROM t_task LEFT JOIN m_category ON t_task.category_id = m_category.category_id ORDER BY deadline";
     let data = [];
     const [rows, fields] = await connection.query(sql, data);
     return rows;
@@ -51,22 +53,21 @@ getItem = async function (id) {
  *
  * @returns レスポンス JSON
  */
-categoryFilter = async function(category_id){
+categoryFilter = async function (category_id) {
   let connection = null;
   try {
     connection = await mysql.createConnection(config.dbSetting);
     // SQL記述
-    const sql = 'SELECT * FROM t_task WHERE category_id = ?';
+    const sql = "SELECT * FROM t_task WHERE category_id = ?";
     let data = [category_id];
     const [rows, fields] = await connection.query(sql, data);
     return rows;
-
   } catch (error) {
     console.log(error);
   } finally {
     connection.end();
   }
-}
+};
 
 /**
  * sortTasks
@@ -74,24 +75,24 @@ categoryFilter = async function(category_id){
  *
  * @returns レスポンス JSON
  */
-sortTasks = async function(sortBy){
+sortTasks = async function (sortBy) {
   let connection = null;
   try {
     connection = await mysql.createConnection(config.dbSetting);
     // SQL記述
-    let sql = '';
+    let sql = "";
     switch (sortBy) {
-      case '0':
-        sql = 'SELECT * FROM t_task ORDER BY id';
+      case "0":
+        sql = "SELECT * FROM t_task ORDER BY id";
         break;
-      case '1':
-        sql = 'SELECT * FROM t_task ORDER BY deadline ASC';
+      case "1":
+        sql = "SELECT * FROM t_task ORDER BY deadline ASC";
         break;
-      case '2':
-        sql = 'SELECT * FROM t_task ORDER BY deadline DESC';
+      case "2":
+        sql = "SELECT * FROM t_task ORDER BY deadline DESC";
         break;
       default:
-        sql = 'SELECT * FROM t_task ORDER BY deadline ASC';
+        sql = "SELECT * FROM t_task ORDER BY deadline ASC";
         break;
     }
     const [rows, fields] = await connection.query(sql);
@@ -102,8 +103,7 @@ sortTasks = async function(sortBy){
   } finally {
     connection.end();
   }
-}
-
+};
 
 /**
  * searchItem
@@ -111,12 +111,12 @@ sortTasks = async function(sortBy){
  *
  * @returns レスポンス JSON
  */
-searchItem = async function(keyword){
+searchItem = async function (keyword) {
   let connection = null;
   try {
     connection = await mysql.createConnection(config.dbSetting);
     // SQL記述
-    const sql = 'SELECT * FROM t_task WHERE task_name LIKE ?';
+    const sql = "SELECT * FROM t_task WHERE task_name LIKE ?";
     keyword = "%" + keyword + "%";
     let data = [keyword];
     const [rows, fields] = await connection.query(sql, data);
@@ -126,7 +126,7 @@ searchItem = async function(keyword){
   } finally {
     connection.end();
   }
-}
+};
 
 /**
  * getTodayTask
@@ -139,7 +139,8 @@ getTodayTask = async function () {
   try {
     connection = await mysql.createConnection(config.dbSetting);
     // SQL記述
-    const sql = "SELECT * FROM t_task WHERE deadline >= CURDATE()  AND deadline < DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY)";
+    const sql =
+      "SELECT * FROM t_task WHERE deadline >= CURDATE()  AND deadline < DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY)";
     const [rows, fields] = await connection.query(sql);
     return rows;
   } catch (error) {
@@ -149,42 +150,39 @@ getTodayTask = async function () {
   }
 };
 
-
 /**
  * getMonthlyTasks
  * カレンダー用にその月のタスクを取得
  *
  * @returns レスポンス JSON
  */
-getMonthlyTasks = async function(){
+getMonthlyTasks = async function () {
   let connection = null;
   try {
     connection = await mysql.createConnection(config.dbSetting);
     let today = new Date();
     let thisYear = today.getFullYear();
-    let thisMonth = today.getMonth()+1;
-
+    let thisMonth = today.getMonth() + 1;
 
     // 月の末日を取得
-    today.setMonth(today.getMonth()+1);
+    today.setMonth(today.getMonth() + 1);
     today.setDate(0);
     let lastDayOfMonth = today.getDate();
 
     let minDate = `${thisYear}-${thisMonth}-1`;
     let maxDate = `${thisYear}-${thisMonth}-${lastDayOfMonth}`;
     // SQL記述
-    const sql = "SELECT id, task_name, CAST(deadline AS DATE) AS deadline, task_status,category_id FROM t_task WHERE deadline >= ? AND deadline < ? ORDER BY deadline";
-    let data = [minDate,maxDate];
-    const [rows, fields] = await connection.query(sql,data);
+    const sql =
+      "SELECT id, task_name, CAST(deadline AS DATE) AS deadline, task_status,category_id FROM t_task WHERE deadline >= ? AND deadline < ? ORDER BY deadline";
+    let data = [minDate, maxDate];
+    const [rows, fields] = await connection.query(sql, data);
     return rows;
   } catch (error) {
     console.log(error);
   } finally {
     connection.end();
   }
-}
-
-
+};
 
 exports.getListItem = getListItem;
 exports.getItem = getItem;

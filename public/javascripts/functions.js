@@ -15,7 +15,6 @@ $(function () {
 
 // タスク一覧取得API
 $(async function () {
-  $("");
   const data = await httpGet("//" + window.location.host + "/api/items");
   $("#todo-list").empty();
   console.log(data);
@@ -26,10 +25,17 @@ $(async function () {
 $("#today-tasks").click(async function () {
   click = false;
   const data = await httpGet("//" + window.location.host + "/api/today");
+  const dataLength = data.length;
   $("#todo-list").empty();
-  $("#todo-list").append("今日が期限のタスクはありません。");
   console.log(data);
-  $("#todo-list").append(getList(data));
+  if (dataLength === 0) {
+    $("#todo-list").append("今日が期限のタスクはありません。");
+  } else {
+    $("#todo-list").append(
+      `今日までに完了すべきタスクが  「 ${dataLength}件  」 ありました`
+    );
+    $("#todo-list").append(getList(data));
+  }
 });
 
 // Get Task Detail
@@ -418,7 +424,6 @@ $("#update-complete").click(async function () {
       targetDate.getMonth() + 1 !== month
     ) {
       console.log(targetDate.getMonth() + 1);
-      console.log(month);
       inputError("#update-error", "存在しない日付のようです。");
       return false;
     }
@@ -474,6 +479,21 @@ $("#delete-complete").click(async function () {
   window.location.reload();
 });
 
+// Delete task by calendar
+$("#delete-by-calendar").click(async function () {
+  const id = $("#delete-by-calendar").data("id");
+  let confirmation = window.confirm("本当に消去しますか？");
+  if (confirmation === true) {
+    const response = await httpDelete(
+      "//" + window.location.host + `/api/tasks/${id}`
+    );
+    console.log("deleted.");
+    alert("消去しました。");
+  } else {
+    return false;
+  }
+});
+
 // Delete all time-out-tasks
 $(document).on("click", "#delete-timeoutTask", async function () {
   let confirmation = window.confirm("本当に消すんですね？");
@@ -506,7 +526,6 @@ $(document).on("click", "#delete-compTask", async function () {
 
 // search task by keyword
 $("#search-icon").click(async function () {
-  click = false;
   $("[name=category_filter]").val(0);
   let keyword = $("[name=task-search]").val();
   const data = await httpGet(
@@ -567,7 +586,6 @@ $("[name=sort-by]").on("change", async function () {
 
 // Hide completed task.
 $("#completed-hide").on("click", function () {
-  click = false;
   if (!$(this).hasClass("active")) {
     $(this).addClass("active");
     $(".completed_task").toggle("hide");
@@ -899,14 +917,12 @@ function getSimpleList(data) {
 
 // get calendar
 $("#open-calendar").click(async function () {
-  if ($("#calendar tr").length > 1) {
-    $("#calendar").empty();
-  }
+  $(".calendar-content").empty();
   let today = new Date();
   let thisYear = today.getFullYear();
   let thisMonth = today.getMonth() + 1;
-  today.setDate(1);
   let thisDate = today.getDate();
+  today.setDate(1);
   let weekOfFirst = today.getDay();
   let lastDayOfMonth = getLastDay();
   let skipWeek = 0;
@@ -961,7 +977,7 @@ $("#open-calendar").click(async function () {
   let stripe;
   let maxCurrent = (lastDayOfMonth + skipWeek) / 7;
   for (let i = 1; i <= maxCurrent; i++) {
-    tables += "<tr>";
+    tables += '<tr class="calendar-content">';
     for (let j = 1; j <= 7; j++) {
       tasksString = "";
       if (current === 1 && j <= skipWeek) {
@@ -993,7 +1009,6 @@ $("#open-calendar").click(async function () {
     }
     tables += "</tr>aaaaaaaaaaaa<br>";
     ++current;
-    console.log(taskArray);
   }
   $("#year-month").text(`締切カレンダー(${thisYear}年${thisMonth}月）`);
   $("#calendar").append(tables);
