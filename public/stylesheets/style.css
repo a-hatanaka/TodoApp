@@ -21,7 +21,6 @@ li {
   display: none;
 }
 
-
 .back-gray {
   background-color: gainsboro;
   color: black;
@@ -31,8 +30,6 @@ li {
   text-decoration: line-through !important;
 }
 
-
-
 /* .minus-margin {
   margin-left: -20px;
 } */
@@ -40,7 +37,6 @@ li {
 .backGray {
   background-color: darkgray;
 }
-
 
 .blueTag {
   background-color: skyblue;
@@ -160,7 +156,6 @@ li {
   font-weight: bold;
 }
 
-
 .error-message {
   margin-left: 10%;
 }
@@ -180,7 +175,6 @@ li {
   text-decoration: none !important;
 }
 
-
 /* status-toggle-switch */
 .status-toggle {
   position: relative;
@@ -191,7 +185,7 @@ li {
   overflow: hidden;
   cursor: pointer;
 }
-.status-toggle input[type=checkbox] {
+.status-toggle input[type="checkbox"] {
   display: none;
 }
 .status-toggle:before {
@@ -225,7 +219,7 @@ li {
   font-size: 10px;
   font-weight: bold;
   color: black;
-  letter-spacing: .5px;
+  letter-spacing: 0.5px;
   box-sizing: border-box;
 }
 .status-toggle.checked:before {
@@ -238,14 +232,14 @@ li {
   color: black;
 }
 
-
-
 /* Calendar  */
 #calendar {
   border: black 1px;
 }
 
-table, td, th {
+table,
+td,
+th {
   border: 2px black solid;
   text-align: center;
 }

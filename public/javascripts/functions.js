@@ -133,7 +133,10 @@ $("#create-task").click(async function () {
         "日付が正しいフォーマットで入力されていません。"
       );
       return false;
-    } else if (targetDate.getFullYear() === 1970) {
+    } else if (
+      targetDate.getFullYear() === 1970 ||
+      targetDate.getMonth() + 1 !== month
+    ) {
       inputError("#create-error", "存在しない日付のようです。");
       return false;
     }
