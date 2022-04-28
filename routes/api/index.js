@@ -1,10 +1,42 @@
 var express = require("express");
+const res = require("express/lib/response");
 const items = require("../../src/items");
 const create = require("../../src/tasks/create.js");
 const del = require("../../src/tasks/delete.js");
 const update = require("../../src/tasks/update.js");
+const users = require("../../src/users.js");
+const session = require("express-session");
+const app = express();
 
 var router = express.Router();
+
+app.use(
+  session({
+    secret: "secret_key",
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      maxAge: 10000,
+    },
+  })
+);
+
+router.post("/users", async function (req, res, next) {
+  const response = await users.createUser(req.body);
+  res.send(response);
+});
+
+router.get("/users", async function (req, res, next) {
+  const data = await users.getUsers();
+  res.send(data);
+});
+
+router.post("/user/login", async function (req, res, next) {
+  const response = await users.loginUser(req.body);
+  console.log(req.session);
+  // req.session.user = { name: req.body.userName };
+  res.send(response);
+});
 
 /* 商品一覧を取得するルーティング */
 router.get("/items", async function (req, res, next) {

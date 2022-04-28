@@ -38,6 +38,8 @@
       カレンダー表示
     </button>
 
+    <p id="loginAs"></p>
+
     <!-- Dangerous Actions  -->
     <div id="top-hidden">
       <div id="dangerous-actions">
@@ -563,6 +565,27 @@
       </div>
     </div>
 
+    <div>
+      <form id="createUser" action="">
+        <label for="userName">名前</label>
+        <input name="userName" type="text" />
+        <label for="email">email</label>
+        <input name="email" type="email" />
+        <label for="password">パスワード</label>
+        <input name="password" type="password" />
+        <input type="button" value="送信" id="create-user" />
+      </form>
+    </div>
+    <br />
+    <div>
+      <form id="loginForm" action="">
+        <label for="email">email</label>
+        <input name="email" type="text" />
+        <label for="password">パスワード</label>
+        <input name="password" type="password" />
+        <input type="button" value="ログイン" id="loginBtn" />
+      </form>
+    </div>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script
@@ -585,9 +608,34 @@
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script>
+      $(function () {
+        if (window.sessionStorage.getItem(["loginId"])) {
+          $("#loginAs").text(window.sessionStorage.getItem(["loginId"]));
+        }
+      });
       function reloadPage() {
         location.reload();
       }
+      $("#create-user").click(async function () {
+        const userName = $("#createUser input[name=userName]").val();
+        const password = $("#createUser input[name=password]").val();
+        const response = await httpPost(
+          "//" + window.location.host + "/api/users",
+          { userName: userName, password: password }
+        );
+        alert(response);
+      });
+      $("#loginBtn").click(async function () {
+        const email = $("#loginForm input[name=email]").val();
+        const password = $("#loginForm input[name=password]").val();
+        const response = await httpPost(
+          "//" + window.location.host + "/api/user/login",
+          { email: email, password: password }
+        );
+        alert(`${response.loginName} さんとしてログインしました。`);
+
+        return;
+      });
     </script>
   </body>
 </html>
